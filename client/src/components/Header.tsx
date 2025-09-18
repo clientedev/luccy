@@ -23,7 +23,7 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3" data-testid="link-home">
             <img 
-              src="attached_assets/luccy-logo.png" 
+              src="/luccy-logo.png" 
               alt="Luccy Studio Logo" 
               className="w-12 h-12 object-contain"
             />

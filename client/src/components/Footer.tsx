@@ -30,9 +30,11 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-primary-foreground font-serif font-bold">L</span>
-              </div>
+              <img 
+                src="/luccy-logo.png" 
+                alt="Luccy Studio Logo" 
+                className="w-10 h-10 object-contain"
+              />
               <div>
                 <h4 className="text-lg font-serif font-bold">Luccy Studio</h4>
                 <p className="text-sm text-background/70">Beleza & Elegância</p>
