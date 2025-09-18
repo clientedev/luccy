@@ -37,13 +37,13 @@ export default function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-              <Button asChild className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-black font-bold px-10 py-6 text-xl rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300" data-testid="button-schedule">
+              <Button asChild className="bg-gradient-to-r from-rose-400 via-pink-300 to-orange-300 hover:from-rose-500 hover:via-pink-400 hover:to-orange-400 text-black font-bold px-10 py-6 text-xl rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300 hover:shadow-rose-400/50" data-testid="button-schedule">
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
                   <i className="fab fa-whatsapp text-2xl mr-3"></i>
                   Agendar Transformação
                 </a>
               </Button>
-              <Button asChild variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-black px-10 py-6 text-xl rounded-full backdrop-blur-sm bg-white/10 transition-all duration-300" data-testid="button-services">
+              <Button asChild variant="outline" className="border-2 border-rose-300 text-white hover:bg-gradient-to-r hover:from-rose-400 hover:via-pink-300 hover:to-orange-300 hover:text-black px-10 py-6 text-xl rounded-full backdrop-blur-sm bg-white/10 transition-all duration-300 hover:shadow-rose-400/30" data-testid="button-services">
                 <Link href="/servicos">
                   Descobrir Serviços
                 </Link>
@@ -52,7 +52,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
               <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-6 border border-white/20">
-                <div className="w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-rose-400 via-pink-300 to-orange-300 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-400/30">
                   <i className="fas fa-crown text-black text-2xl"></i>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">20+</h3>
@@ -60,7 +60,7 @@ export default function Home() {
               </div>
               
               <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-6 border border-white/20">
-                <div className="w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-rose-400 via-pink-300 to-orange-300 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-400/30">
                   <i className="fas fa-star text-black text-2xl"></i>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">1000+</h3>
@@ -68,7 +68,7 @@ export default function Home() {
               </div>
               
               <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-6 border border-white/20">
-                <div className="w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-rose-400 via-pink-300 to-orange-300 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-400/30">
                   <i className="fas fa-gem text-black text-2xl"></i>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">Premium</h3>
