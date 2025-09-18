@@ -19,114 +19,90 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section 
-        className="relative min-h-screen flex items-center bg-cover bg-center bg-no-repeat hero-vignette"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/hero-bg.jpg)',
-        }}
-      >
-        <div className="relative z-10 container mx-auto px-4">
-          <div className="grid lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-7 xl:col-span-6">
-              <div className="max-w-2xl">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold leading-tight mb-6">
-                  <span style={{color: 'var(--hero-text)'}}>Transforme sua </span>
-                  <span className="hero-rose-gold-text">beleza</span>
-                  <span style={{color: 'var(--hero-text)'}}> com elegância</span>
-                </h1>
-                <p className="text-lg lg:text-xl mb-10 leading-relaxed" style={{color: 'var(--hero-text)', opacity: '0.9'}}>
-                  Mais de 20 anos de excelência em beleza. Especializados em cabelo, unhas, cílios e maquiagem com técnicas exclusivas e produtos premium.
-                </p>
-                
-                <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                  <Button asChild className="hero-rose-gold hero-sheen text-black font-bold px-8 py-4 text-lg rounded-full shadow-2xl hover:shadow-lg transition-all duration-300 border-0" data-testid="button-schedule">
-                    <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                      <i className="fab fa-whatsapp text-xl mr-3"></i>
-                      Agendar Transformação
-                    </a>
-                  </Button>
-                  <Button asChild variant="ghost" className="hero-sheen px-8 py-4 text-lg rounded-full transition-all duration-300 border-2 hover:bg-white/10" 
-                    style={{
-                      borderImage: 'linear-gradient(135deg, var(--rose-gold-start), var(--rose-gold-mid), var(--rose-gold-end)) 1',
-                      color: 'var(--rose-gold-start)'
-                    }} 
-                    data-testid="button-services">
-                    <Link href="/servicos">
-                      Descobrir Serviços
-                    </Link>
-                  </Button>
-                </div>
-
-                <div className="flex items-center space-x-8">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold hero-rose-gold-text mb-1">20+</div>
-                    <div className="text-sm opacity-80" style={{color: 'var(--hero-text)'}}>Anos de Experiência</div>
-                  </div>
-                  <div className="w-px h-12 bg-white/20"></div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold hero-rose-gold-text mb-1">1000+</div>
-                    <div className="text-sm opacity-80" style={{color: 'var(--hero-text)'}}>Clientes Satisfeitas</div>
-                  </div>
-                  <div className="w-px h-12 bg-white/20"></div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold hero-rose-gold-text mb-1">Premium</div>
-                    <div className="text-sm opacity-80" style={{color: 'var(--hero-text)'}}>Produtos Exclusivos</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <section className="hero-sophisticated min-h-screen flex items-center justify-center">
+        <div className="hero-content container mx-auto px-4 text-center">
+          <div className="max-w-4xl mx-auto">
+            {/* Headline de Impacto */}
+            <h1 className="font-serif-luxury text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-black">
+              Transforme sua Beleza,<br />
+              <span className="text-nude">Realce sua Essência</span>
+            </h1>
             
-            <div className="lg:col-span-5 xl:col-span-6 hidden lg:block">
-              {/* Espaço reservado para o background da imagem */}
+            {/* Subtítulo */}
+            <p className="font-sans-modern text-lg sm:text-xl lg:text-2xl mb-12 text-black/80 max-w-2xl mx-auto leading-relaxed">
+              Mais de 20 anos de excelência em técnicas exclusivas de beleza. 
+              Um refúgio de sofisticação onde sua essência encontra a perfeição.
+            </p>
+            
+            {/* CTA Principal */}
+            <div>
+              <Button asChild className="cta-luxury bg-black text-white hover:bg-black hover:text-white font-sans-modern px-12 py-6 text-xl rounded-full font-semibold" data-testid="button-schedule">
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  <i className="fab fa-whatsapp text-2xl mr-3"></i>
+                  Agende seu Horário
+                </a>
+              </Button>
             </div>
-          </div>
-        </div>
-        
-        <div className="absolute bottom-8 left-8 animate-pulse">
-          <div className="w-6 h-10 rounded-full flex justify-center border-2" style={{borderColor: 'var(--rose-gold-start)'}}>
-            <div className="w-1 h-3 rounded-full mt-2 hero-rose-gold"></div>
           </div>
         </div>
       </section>
 
       {/* Highlights Section */}
-      <section className="py-16 bg-card">
+      <section className="py-20 bg-nude">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-serif font-bold text-foreground mb-4">Nossos Diferenciais</h3>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+          {/* Estatísticas de Confiança */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto mb-16">
+            <div className="text-center">
+              <div className="text-5xl font-serif-luxury font-bold text-black mb-3">20+</div>
+              <div className="font-sans-modern text-black/70 text-base uppercase tracking-wide">Anos de Experiência</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-5xl font-serif-luxury font-bold text-black mb-3">1000+</div>
+              <div className="font-sans-modern text-black/70 text-base uppercase tracking-wide">Clientes Satisfeitas</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-5xl font-serif-luxury font-bold text-black mb-3">Premium</div>
+              <div className="font-sans-modern text-black/70 text-base uppercase tracking-wide">Produtos Exclusivos</div>
+            </div>
+          </div>
+
+          <div className="text-center mb-16">
+            <h3 className="font-serif-luxury text-4xl lg:text-5xl font-bold text-black mb-6">Nossos Diferenciais</h3>
+            <p className="font-sans-modern text-lg text-black/80 max-w-2xl mx-auto">
               Combinamos técnicas avançadas com um ambiente sofisticado para proporcionar a melhor experiência em beleza.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="text-center p-6 bg-background border border-border hover:shadow-lg transition-shadow">
+          <div className="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto">
+            <Card className="text-center p-8 bg-white border-0 shadow-lg hover:shadow-xl transition-shadow">
               <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-users text-primary text-2xl"></i>
+                <div className="w-20 h-20 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
+                  <i className="fas fa-users text-white text-2xl"></i>
                 </div>
-                <h4 className="text-xl font-serif font-semibold text-foreground mb-3">Técnicas Avançadas</h4>
-                <p className="text-muted-foreground">Profissionais especializados com as melhores técnicas em beleza</p>
+                <h4 className="font-serif-luxury text-2xl font-semibold text-black mb-4">Técnicas Avançadas</h4>
+                <p className="font-sans-modern text-black/70 leading-relaxed">Profissionais especializados com as melhores técnicas em beleza</p>
               </CardContent>
             </Card>
 
-            <Card className="text-center p-6 bg-background border border-border hover:shadow-lg transition-shadow">
+            <Card className="text-center p-8 bg-white border-0 shadow-lg hover:shadow-xl transition-shadow">
               <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-shopping-bag text-primary text-2xl"></i>
+                <div className="w-20 h-20 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
+                  <i className="fas fa-gem text-white text-2xl"></i>
                 </div>
-                <h4 className="text-xl font-serif font-semibold text-foreground mb-3">Produtos Premium</h4>
-                <p className="text-muted-foreground">Seleção exclusiva dos melhores produtos para sua beleza</p>
+                <h4 className="font-serif-luxury text-2xl font-semibold text-black mb-4">Produtos Premium</h4>
+                <p className="font-sans-modern text-black/70 leading-relaxed">Seleção exclusiva dos melhores produtos para sua beleza</p>
               </CardContent>
             </Card>
 
-            <Card className="text-center p-6 bg-background border border-border hover:shadow-lg transition-shadow">
+            <Card className="text-center p-8 bg-white border-0 shadow-lg hover:shadow-xl transition-shadow">
               <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-crown text-primary text-2xl"></i>
+                <div className="w-20 h-20 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
+                  <i className="fas fa-crown text-white text-2xl"></i>
                 </div>
-                <h4 className="text-xl font-serif font-semibold text-foreground mb-3">Ambiente Exclusivo</h4>
-                <p className="text-muted-foreground">Espaço sofisticado e acolhedor para sua completa transformação</p>
+                <h4 className="font-serif-luxury text-2xl font-semibold text-black mb-4">Ambiente Exclusivo</h4>
+                <p className="font-sans-modern text-black/70 leading-relaxed">Espaço sofisticado e acolhedor para sua completa transformação</p>
               </CardContent>
             </Card>
           </div>

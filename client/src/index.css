@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -37,7 +37,7 @@
   --sidebar-accent-foreground: hsl(20, 14%, 11%);
   --sidebar-border: hsl(30, 12%, 85%);
   --sidebar-ring: hsl(43, 74%, 49%);
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Montserrat', system-ui, sans-serif;
   --font-serif: 'Playfair Display', serif;
   --font-mono: Menlo, monospace;
   --radius: 0.75rem;
@@ -82,14 +82,13 @@
   --sidebar-border: hsl(20, 14%, 18%);
   --sidebar-ring: hsl(43, 74%, 49%);
   
-  /* Hero section luxury colors */
-  --hero-base: hsl(230, 15%, 6%);
-  --hero-surface: hsl(230, 12%, 10%);
-  --hero-text: hsl(30, 28%, 96%);
-  --rose-gold-start: hsl(16, 60%, 86%);
-  --rose-gold-mid: hsl(18, 47%, 72%);
-  --rose-gold-end: hsl(20, 35%, 56%);
-  --rose-gold-highlight: hsl(30, 25%, 95%);
+  /* Luccy Studio luxury colors */
+  --nude: #E7D7C9;
+  --black: #000000;
+  --white: #FFFFFF;
+  --nude-overlay: rgba(231, 215, 201, 0.7);
+  --font-serif-luxury: 'Playfair Display', serif;
+  --font-sans-modern: 'Montserrat', sans-serif;
 }
 
 @layer base {
@@ -103,55 +102,68 @@
 }
 
 @layer utilities {
-  .hero-rose-gold {
-    background: linear-gradient(135deg, 
-      var(--rose-gold-start), 
-      var(--rose-gold-mid), 
-      var(--rose-gold-end)
-    );
+  .luxury-gradient {
+    background: linear-gradient(135deg, var(--nude) 0%, var(--white) 100%);
   }
 
-  .hero-rose-gold-text {
-    background: linear-gradient(135deg, 
-      var(--rose-gold-start), 
-      var(--rose-gold-mid), 
-      var(--rose-gold-end)
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .nude-overlay {
+    background-color: var(--nude-overlay, rgba(231, 215, 201, 0.7));
   }
 
-  .hero-sheen {
+  .font-serif-luxury {
+    font-family: var(--font-serif-luxury, 'Playfair Display', serif);
+  }
+
+  .font-sans-modern {
+    font-family: var(--font-sans-modern, 'Montserrat', sans-serif);
+  }
+
+  .hero-sophisticated {
     position: relative;
-    overflow: hidden;
+    background-image: url(/hero-bg.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
-  .hero-sheen::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.6s;
-  }
-
-  .hero-sheen:hover::before {
-    left: 100%;
-  }
-
-  .hero-vignette {
-    position: relative;
-  }
-
-  .hero-vignette::after {
+  .hero-sophisticated::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.3) 100%);
-    pointer-events: none;
+    background-color: var(--nude-overlay, rgba(231, 215, 201, 0.7));
+    z-index: 1;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta-luxury {
+    background-color: var(--black, #000000) !important;
+    color: var(--white, #FFFFFF) !important;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .cta-luxury:hover {
+    background-color: var(--black, #000000) !important;
+    color: var(--white, #FFFFFF) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  .text-nude {
+    color: var(--nude, #E7D7C9);
+  }
+
+  .bg-nude {
+    background-color: var(--nude, #E7D7C9);
+  }
+
+  .border-nude {
+    border-color: var(--nude, #E7D7C9);
   }
   
   .service-card:hover {
