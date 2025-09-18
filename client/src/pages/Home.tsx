@@ -19,50 +19,68 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="hero-gradient py-20 lg:py-32">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left">
-              <h2 className="text-4xl lg:text-6xl font-serif font-bold text-foreground mb-6">
-                Transforme sua <span className="text-primary">beleza</span> com elegância
-              </h2>
-              <p className="text-lg text-muted-foreground mb-8 max-w-lg">
-                Mais de 20 anos de experiência em moda e beleza. Especializados em cabelo, unhas, cílios e maquiagem com um toque sofisticado.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg" data-testid="button-schedule">
-                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                    <i className="fab fa-whatsapp text-xl mr-2"></i>
-                    Agende seu horário
-                  </a>
-                </Button>
-                <Button asChild variant="outline" className="px-8 py-6 text-lg" data-testid="button-services">
-                  <Link href="/servicos">
-                    Nossos Serviços
-                  </Link>
-                </Button>
-              </div>
+      <section 
+        className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), url(/hero-bg.jpg)',
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/60"></div>
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-5xl lg:text-7xl xl:text-8xl font-serif font-bold text-white mb-8 leading-tight">
+              Redefina sua 
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-400"> beleza</span>
+            </h1>
+            <p className="text-xl lg:text-2xl text-gray-200 mb-12 max-w-3xl mx-auto leading-relaxed">
+              Mais de 20 anos transformando autoestimas com técnicas exclusivas e um toque de sofisticação que só o Luccy Studio oferece.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+              <Button asChild className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-black font-bold px-10 py-6 text-xl rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300" data-testid="button-schedule">
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  <i className="fab fa-whatsapp text-2xl mr-3"></i>
+                  Agendar Transformação
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-black px-10 py-6 text-xl rounded-full backdrop-blur-sm bg-white/10 transition-all duration-300" data-testid="button-services">
+                <Link href="/servicos">
+                  Descobrir Serviços
+                </Link>
+              </Button>
             </div>
 
-            <div className="relative">
-              <img
-                src="https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600"
-                alt="Interior elegante do Luccy Studio"
-                className="rounded-2xl shadow-2xl w-full h-auto"
-                data-testid="hero-image"
-              />
-              <div className="absolute -bottom-6 -left-6 bg-card p-6 rounded-xl shadow-lg border border-border">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                    <i className="fas fa-star text-primary-foreground"></i>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">Padrão de Excelência</p>
-                    <p className="text-primary font-bold" data-testid="text-monthly-goal">20+ Anos</p>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+              <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-6 border border-white/20">
+                <div className="w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-crown text-black text-2xl"></i>
                 </div>
+                <h3 className="text-2xl font-bold text-white mb-2">20+</h3>
+                <p className="text-gray-300">Anos de Excelência</p>
+              </div>
+              
+              <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-6 border border-white/20">
+                <div className="w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-star text-black text-2xl"></i>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">1000+</h3>
+                <p className="text-gray-300">Clientes Satisfeitas</p>
+              </div>
+              
+              <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-6 border border-white/20">
+                <div className="w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-gem text-black text-2xl"></i>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">Premium</h3>
+                <p className="text-gray-300">Produtos Exclusivos</p>
               </div>
             </div>
+          </div>
+        </div>
+        
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-white rounded-full mt-2 animate-pulse"></div>
           </div>
         </div>
       </section>
