@@ -22,9 +22,11 @@ export default function Header() {
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3" data-testid="link-home">
-            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-primary-foreground font-serif font-bold text-xl">L</span>
-            </div>
+            <img 
+              src="attached_assets/luccy-logo.png" 
+              alt="Luccy Studio Logo" 
+              className="w-12 h-12 object-contain"
+            />
             <div>
               <h1 className="text-2xl font-serif font-bold text-foreground">Luccy Studio</h1>
               <p className="text-sm text-muted-foreground">Beleza & Elegância</p>

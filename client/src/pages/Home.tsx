@@ -57,8 +57,8 @@ export default function Home() {
                     <i className="fas fa-star text-primary-foreground"></i>
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">Meta Mensal</p>
-                    <p className="text-primary font-bold" data-testid="text-monthly-goal">R$ 15.000</p>
+                    <p className="font-semibold text-foreground">Padrão de Excelência</p>
+                    <p className="text-primary font-bold" data-testid="text-monthly-goal">20+ Anos</p>
                   </div>
                 </div>
               </div>
@@ -83,8 +83,8 @@ export default function Home() {
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <i className="fas fa-users text-primary text-2xl"></i>
                 </div>
-                <h4 className="text-xl font-serif font-semibold text-foreground mb-3">Atrair Clientes</h4>
-                <p className="text-muted-foreground">Experiência única que fideliza e encanta cada cliente</p>
+                <h4 className="text-xl font-serif font-semibold text-foreground mb-3">Técnicas Avançadas</h4>
+                <p className="text-muted-foreground">Profissionais especializados com as melhores técnicas em beleza</p>
               </CardContent>
             </Card>
 
@@ -93,8 +93,8 @@ export default function Home() {
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <i className="fas fa-shopping-bag text-primary text-2xl"></i>
                 </div>
-                <h4 className="text-xl font-serif font-semibold text-foreground mb-3">Vender Produtos</h4>
-                <p className="text-muted-foreground">Curadoria especial de produtos de alta qualidade</p>
+                <h4 className="text-xl font-serif font-semibold text-foreground mb-3">Produtos Premium</h4>
+                <p className="text-muted-foreground">Seleção exclusiva dos melhores produtos para sua beleza</p>
               </CardContent>
             </Card>
 
@@ -103,8 +103,8 @@ export default function Home() {
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <i className="fas fa-crown text-primary text-2xl"></i>
                 </div>
-                <h4 className="text-xl font-serif font-semibold text-foreground mb-3">Fortalecer Marca</h4>
-                <p className="text-muted-foreground">Referência em beleza e sofisticação</p>
+                <h4 className="text-xl font-serif font-semibold text-foreground mb-3">Ambiente Exclusivo</h4>
+                <p className="text-muted-foreground">Espaço sofisticado e acolhedor para sua completa transformação</p>
               </CardContent>
             </Card>
           </div>
