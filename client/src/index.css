@@ -160,14 +160,11 @@
       background-image: url(/hero-bg-mobile.jpg);
       background-position: center top;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     
     .hero-content {
-      padding-top: 5vh;
-      padding-bottom: 5vh;
+      padding-top: 15vh;
+      padding-bottom: 10vh;
     }
   }
 
