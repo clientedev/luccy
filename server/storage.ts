@@ -4,7 +4,7 @@ import {
   type Product, type InsertProduct, type Service, type InsertService,
   type Testimonial, type InsertTestimonial, type GalleryImage, type InsertGalleryImage,
   type SiteSettings, type InsertSiteSettings
-} from "@shared/schema";
+} from "../shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
