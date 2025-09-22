@@ -84,6 +84,8 @@
   
   /* Luccy Studio luxury colors */
   --nude: #E7D7C9;
+  --pink-light: #F5D1E6;
+  --gold: #D4AF37;
   --black: #000000;
   --white: #FFFFFF;
   --nude-overlay: rgba(231, 215, 201, 0.7);
@@ -116,6 +118,26 @@
 
   .font-sans-modern {
     font-family: var(--font-sans-modern, 'Montserrat', sans-serif);
+  }
+
+  .text-nude {
+    color: var(--nude);
+  }
+
+  .text-pink-light {
+    color: var(--pink-light);
+  }
+
+  .text-gold {
+    color: var(--gold);
+  }
+
+  .bg-nude {
+    background-color: var(--nude);
+  }
+
+  .bg-pink-light {
+    background-color: var(--pink-light);
   }
 
   .hero-sophisticated {

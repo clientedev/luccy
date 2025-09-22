@@ -48,7 +48,7 @@ export default function Home() {
       </section>
 
       {/* Highlights Section */}
-      <section className="py-20 bg-nude">
+      <section className="py-20 bg-pink-light">
         <div className="container mx-auto px-4">
           {/* Estatísticas de Confiança */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto mb-16">
@@ -58,7 +58,7 @@ export default function Home() {
             </div>
             
             <div className="text-center">
-              <div className="text-5xl font-serif-luxury font-bold text-black mb-3">1000+</div>
+              <div className="text-5xl font-serif-luxury font-bold text-black mb-3">200</div>
               <div className="font-sans-modern text-black/70 text-base uppercase tracking-wide">Clientes Satisfeitas</div>
             </div>
             
@@ -69,8 +69,8 @@ export default function Home() {
           </div>
 
           <div className="text-center mb-16">
-            <h3 className="font-serif-luxury text-4xl lg:text-5xl font-bold text-black mb-6">Nossos Diferenciais</h3>
-            <p className="font-sans-modern text-lg text-black/80 max-w-2xl mx-auto">
+            <h3 className="font-serif-luxury text-4xl lg:text-5xl font-bold text-gold mb-6">Nossos Diferenciais</h3>
+            <p className="font-sans-modern text-lg text-gold/80 max-w-2xl mx-auto">
               Combinamos técnicas avançadas com um ambiente sofisticado para proporcionar a melhor experiência em beleza.
             </p>
           </div>
@@ -81,8 +81,8 @@ export default function Home() {
                 <div className="w-20 h-20 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
                   <i className="fas fa-users text-white text-2xl"></i>
                 </div>
-                <h4 className="font-serif-luxury text-2xl font-semibold text-black mb-4">Técnicas Avançadas</h4>
-                <p className="font-sans-modern text-black/70 leading-relaxed">Profissionais especializados com as melhores técnicas em beleza</p>
+                <h4 className="font-serif-luxury text-2xl font-semibold text-gold mb-4">Técnicas Avançadas</h4>
+                <p className="font-sans-modern text-gold/70 leading-relaxed">Profissionais especializados com as melhores técnicas em beleza</p>
               </CardContent>
             </Card>
 
@@ -91,8 +91,8 @@ export default function Home() {
                 <div className="w-20 h-20 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
                   <i className="fas fa-gem text-white text-2xl"></i>
                 </div>
-                <h4 className="font-serif-luxury text-2xl font-semibold text-black mb-4">Produtos Premium</h4>
-                <p className="font-sans-modern text-black/70 leading-relaxed">Seleção exclusiva dos melhores produtos para sua beleza</p>
+                <h4 className="font-serif-luxury text-2xl font-semibold text-gold mb-4">Produtos Premium</h4>
+                <p className="font-sans-modern text-gold/70 leading-relaxed">Seleção exclusiva dos melhores produtos para sua beleza</p>
               </CardContent>
             </Card>
 
@@ -101,8 +101,8 @@ export default function Home() {
                 <div className="w-20 h-20 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
                   <i className="fas fa-crown text-white text-2xl"></i>
                 </div>
-                <h4 className="font-serif-luxury text-2xl font-semibold text-black mb-4">Ambiente Exclusivo</h4>
-                <p className="font-sans-modern text-black/70 leading-relaxed">Espaço sofisticado e acolhedor para sua completa transformação</p>
+                <h4 className="font-serif-luxury text-2xl font-semibold text-gold mb-4">Ambiente Exclusivo</h4>
+                <p className="font-sans-modern text-gold/70 leading-relaxed">Espaço sofisticado e acolhedor para sua completa transformação</p>
               </CardContent>
             </Card>
           </div>
