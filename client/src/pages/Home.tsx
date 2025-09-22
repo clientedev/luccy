@@ -60,18 +60,18 @@ export default function Home() {
           {/* Estatísticas de Confiança */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto mb-16">
             <div className="text-center">
-              <div className="text-5xl font-serif-luxury font-bold text-black mb-3">20+</div>
-              <div className="font-sans-modern text-black/70 text-base uppercase tracking-wide">Anos de Experiência</div>
+              <div className="text-5xl font-serif-luxury font-bold text-gold-bright mb-3">20+</div>
+              <div className="font-sans-modern text-gold/80 text-base uppercase tracking-wide">Anos de Experiência</div>
             </div>
             
             <div className="text-center">
-              <div className="text-5xl font-serif-luxury font-bold text-black mb-3">+200</div>
-              <div className="font-sans-modern text-black/70 text-base uppercase tracking-wide">Clientes Satisfeitas</div>
+              <div className="text-5xl font-serif-luxury font-bold text-gold-bright mb-3">+200</div>
+              <div className="font-sans-modern text-gold/80 text-base uppercase tracking-wide">Clientes Satisfeitas</div>
             </div>
             
             <div className="text-center">
-              <div className="text-5xl font-serif-luxury font-bold text-black mb-3">Premium</div>
-              <div className="font-sans-modern text-black/70 text-base uppercase tracking-wide">Produtos Exclusivos</div>
+              <div className="text-5xl font-serif-luxury font-bold text-gold-bright mb-3">Premium</div>
+              <div className="font-sans-modern text-gold/80 text-base uppercase tracking-wide">Produtos Exclusivos</div>
             </div>
           </div>
 

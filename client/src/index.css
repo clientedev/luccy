@@ -154,6 +154,20 @@
     background-repeat: no-repeat;
   }
 
+  /* Mobile hero section with new background */
+  @media (max-width: 768px) {
+    .hero-sophisticated {
+      background-image: url(/hero-bg-mobile.jpg);
+      background-position: center top;
+      min-height: 100vh;
+    }
+    
+    .hero-content {
+      padding-top: 20vh;
+      padding-bottom: 10vh;
+    }
+  }
+
   .hero-sophisticated::before {
     content: '';
     position: absolute;
