@@ -23,13 +23,20 @@ export default function Home() {
         <div className="hero-content container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
             {/* Headline de Impacto */}
-            <h1 className="font-serif-luxury text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-black">
+            {/* Mobile Version */}
+            <h1 className="md:hidden font-serif-luxury text-4xl font-bold leading-tight mb-6 text-gold-bright">
+              Sua melhor versão<br />
+              começa aqui
+            </h1>
+            
+            {/* Desktop Version */}
+            <h1 className="hidden md:block font-serif-luxury text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-gold-bright">
               Transforme sua Beleza,<br />
               <span className="text-nude">Realce sua Essência</span>
             </h1>
             
             {/* Subtítulo */}
-            <p className="font-sans-modern text-lg sm:text-xl lg:text-2xl mb-12 text-black/80 max-w-2xl mx-auto leading-relaxed">
+            <p className="font-sans-modern text-lg sm:text-xl lg:text-2xl mb-12 text-gold-bright/90 max-w-2xl mx-auto leading-relaxed">
               Mais de 20 anos de excelência em técnicas exclusivas de beleza. 
               Um refúgio de sofisticação onde sua essência encontra a perfeição.
             </p>
@@ -58,7 +65,7 @@ export default function Home() {
             </div>
             
             <div className="text-center">
-              <div className="text-5xl font-serif-luxury font-bold text-black mb-3">200</div>
+              <div className="text-5xl font-serif-luxury font-bold text-black mb-3">+200</div>
               <div className="font-sans-modern text-black/70 text-base uppercase tracking-wide">Clientes Satisfeitas</div>
             </div>
             

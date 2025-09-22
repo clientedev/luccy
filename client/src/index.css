@@ -86,6 +86,7 @@
   --nude: #E7D7C9;
   --pink-light: #F5D1E6;
   --gold: #D4AF37;
+  --gold-bright: #FFD700;
   --black: #000000;
   --white: #FFFFFF;
   --nude-overlay: rgba(231, 215, 201, 0.7);
@@ -130,6 +131,11 @@
 
   .text-gold {
     color: var(--gold);
+  }
+
+  .text-gold-bright {
+    color: var(--gold-bright);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
   }
 
   .bg-nude {
