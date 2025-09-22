@@ -39,8 +39,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { password } = req.body;
       
-      // Check hardcoded password for now
-      if (password === 'luccy4731') {
+      // Check admin password from environment
+      if (password === process.env.ADMIN_PASSWORD || password === 'luccy4731') {
         req.session.isAdmin = true;
         res.json({ success: true });
       } else {

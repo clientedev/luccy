@@ -11,16 +11,12 @@
   ],
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index"
-    },
-    {
       "source": "/((?!api).*)",
       "destination": "/index.html"
     }
   ],
   "functions": {
-    "api/index.ts": {
+    "api/[...all].ts": {
       "includeFiles": ["server/**", "shared/**"],
       "runtime": "nodejs20.x"
     }
