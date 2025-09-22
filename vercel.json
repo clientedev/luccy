@@ -17,7 +17,7 @@
   ],
   "functions": {
     "api/[...all].ts": {
-      "includeFiles": ["server/**", "shared/**"],
+      "includeFiles": "{server,shared}/**",
       "runtime": "nodejs20.x"
     }
   }
