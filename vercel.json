@@ -1,24 +1,15 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist/public"
-      }
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/((?!api).*)",
-      "destination": "/index.html"
-    }
-  ],
   "functions": {
     "api/[...all].ts": {
       "includeFiles": "{server,shared}/**",
       "runtime": "nodejs20.x"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/((?!api).*)",
+      "destination": "/index.html"
+    }
+  ]
 }
