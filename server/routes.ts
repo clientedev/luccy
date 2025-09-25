@@ -41,7 +41,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Default admin credentials
       const adminUsername = process.env.ADMIN_USERNAME || 'luccy.admin';
-      const adminPassword = process.env.ADMIN_PASSWORD || 'luccy4731';
+      const adminPassword = process.env.ADMIN_PASSWORD || '4731v8';
       
       if (username === adminUsername && password === adminPassword) {
         req.session.isAdmin = true;
