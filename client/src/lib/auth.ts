@@ -7,8 +7,8 @@ export interface AuthResponse {
 }
 
 export const authService = {
-  async login(password: string): Promise<AuthResponse> {
-    const response = await apiRequest("POST", "/api/admin/login", { password });
+  async login(username: string, password: string): Promise<AuthResponse> {
+    const response = await apiRequest("POST", "/api/admin/login", { username, password });
     return response.json();
   },
 

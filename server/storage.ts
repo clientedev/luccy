@@ -341,6 +341,65 @@ export class MemoryStorage implements IStorage {
   private siteSettings: Map<string, SiteSettings> = new Map();
   private appointments: Map<string, Appointment> = new Map();
 
+  constructor() {
+    this.initializeData();
+  }
+
+  private initializeData() {
+    // Add sample services
+    const sampleServices = [
+      {
+        id: 'service1',
+        name: 'Corte e Escova',
+        description: 'Corte personalizado e escova profissional',
+        price: 'R$ 80,00',
+        duration: '1h30m',
+        featured: true,
+        createdAt: new Date()
+      },
+      {
+        id: 'service2', 
+        name: 'Coloração Completa',
+        description: 'Coloração profissional com produtos de alta qualidade',
+        price: 'A partir de R$ 150,00',
+        duration: '3h',
+        featured: true,
+        createdAt: new Date()
+      },
+      {
+        id: 'service3',
+        name: 'Manicure e Pedicure',
+        description: 'Cuidado completo para unhas das mãos e pés',
+        price: 'R$ 45,00',
+        duration: '1h',
+        featured: false,
+        createdAt: new Date()
+      },
+      {
+        id: 'service4',
+        name: 'Extensão de Cílios',
+        description: 'Alongamento de cílios fio a fio',
+        price: 'R$ 120,00',
+        duration: '2h',
+        featured: true,
+        createdAt: new Date()
+      },
+      {
+        id: 'service5',
+        name: 'Maquiagem Profissional',
+        description: 'Maquiagem para eventos especiais',
+        price: 'A partir de R$ 100,00',
+        duration: '1h',
+        featured: false,
+        createdAt: new Date()
+      }
+    ];
+
+    for (const service of sampleServices) {
+      this.services.set(service.id, service as Service);
+    }
+  }
+
   private generateId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
@@ -635,5 +694,5 @@ export class MemoryStorage implements IStorage {
   }
 }
 
-// Use in-memory storage for development, fallback to database if needed
-export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemoryStorage();
+// Use in-memory storage for development (since no database is provisioned)
+export const storage = new MemoryStorage();

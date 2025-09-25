@@ -21,6 +21,7 @@ interface LoginFormProps {
 }
 
 function LoginForm({ onLogin }: LoginFormProps) {
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -30,7 +31,7 @@ function LoginForm({ onLogin }: LoginFormProps) {
     setIsLoading(true);
 
     try {
-      const response = await authService.login(password);
+      const response = await authService.login(username, password);
       if (response.success) {
         toast({
           title: "Login realizado com sucesso!",
@@ -46,6 +47,7 @@ function LoginForm({ onLogin }: LoginFormProps) {
       });
     } finally {
       setIsLoading(false);
+      setUsername("");
       setPassword("");
     }
   };
@@ -58,10 +60,22 @@ function LoginForm({ onLogin }: LoginFormProps) {
             <i className="fas fa-lock text-primary-foreground text-2xl"></i>
           </div>
           <CardTitle className="text-2xl font-serif">Área Administrativa</CardTitle>
-          <p className="text-muted-foreground">Digite a senha para acessar</p>
+          <p className="text-muted-foreground">Digite suas credenciais para acessar</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="username">Usuário</Label>
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Digite o usuário"
+                required
+                data-testid="input-admin-username"
+              />
+            </div>
             <div>
               <Label htmlFor="password">Senha</Label>
               <Input

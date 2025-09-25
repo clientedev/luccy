@@ -37,16 +37,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin login
   app.post('/api/admin/login', async (req, res) => {
     try {
-      const { password } = req.body;
+      const { username, password } = req.body;
       
-      // Check admin password from environment only (fallback for development)
+      // Default admin credentials
+      const adminUsername = process.env.ADMIN_USERNAME || 'luccy.admin';
       const adminPassword = process.env.ADMIN_PASSWORD || 'luccy4731';
       
-      if (password === adminPassword) {
+      if (username === adminUsername && password === adminPassword) {
         req.session.isAdmin = true;
         res.json({ success: true });
       } else {
-        res.status(401).json({ message: 'Senha incorreta' });
+        res.status(401).json({ message: 'Usuário ou senha incorretos' });
       }
     } catch (error) {
       res.status(500).json({ message: 'Erro interno do servidor' });
