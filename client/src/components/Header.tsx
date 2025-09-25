@@ -48,6 +48,17 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
+            <Link href="/agendamentos">
+              <Button 
+                variant="default" 
+                size="sm"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+                data-testid="button-agende-aqui-header"
+              >
+                <i className="fas fa-calendar-plus mr-2"></i>
+                Agende Aqui
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -80,6 +91,17 @@ export default function Header() {
                   {item.name}
                 </Link>
               ))}
+              <Link href="/agendamentos">
+                <Button 
+                  variant="default" 
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold mt-3"
+                  onClick={() => setMobileMenuOpen(false)}
+                  data-testid="button-agende-aqui-mobile"
+                >
+                  <i className="fas fa-calendar-plus mr-2"></i>
+                  Agende Aqui
+                </Button>
+              </Link>
             </div>
           </div>
         )}

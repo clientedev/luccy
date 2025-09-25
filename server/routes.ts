@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcrypt";
 import session from "express-session";
-import { insertCategorySchema, insertProductSchema, insertServiceSchema, insertTestimonialSchema, insertGalleryImageSchema, insertSiteSettingsSchema } from "../shared/schema";
+import { insertCategorySchema, insertProductSchema, insertServiceSchema, insertTestimonialSchema, insertGalleryImageSchema, insertSiteSettingsSchema, insertAppointmentSchema } from "../shared/schema";
 import { ZodError } from "zod";
 
 declare module "express-session" {
@@ -39,8 +39,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { password } = req.body;
       
-      // Check admin password from environment
-      if (password === process.env.ADMIN_PASSWORD || password === 'luccy4731') {
+      // Check admin password from environment only (fallback for development)
+      const adminPassword = process.env.ADMIN_PASSWORD || 'luccy4731';
+      
+      if (password === adminPassword) {
         req.session.isAdmin = true;
         res.json({ success: true });
       } else {
@@ -397,6 +399,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(500).json({ message: 'Erro ao salvar configuração' });
       }
+    }
+  });
+
+  // Appointments
+  app.get('/api/appointments', async (req, res) => {
+    try {
+      const { date, service, admin } = req.query;
+      let appointments;
+      
+      if (admin === 'true' && req.session?.isAdmin) {
+        // Admin view with service details
+        appointments = await storage.getAppointmentsWithService();
+      } else if (date && typeof date === 'string') {
+        // Get appointments for specific date
+        appointments = await storage.getAppointmentsByDate(date);
+      } else if (service && typeof service === 'string') {
+        // Get appointments for specific service
+        appointments = await storage.getAppointmentsByService(service);
+      } else {
+        // Get all appointments (for checking availability)
+        appointments = await storage.getAppointments();
+      }
+      
+      res.json(appointments);
+    } catch (error) {
+      res.status(500).json({ message: 'Erro ao carregar agendamentos' });
+    }
+  });
+
+  app.post('/api/appointments', async (req, res) => {
+    try {
+      const appointment = insertAppointmentSchema.parse(req.body);
+      const newAppointment = await storage.createAppointment(appointment);
+      res.status(201).json(newAppointment);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ message: 'Dados inválidos', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Erro ao criar agendamento' });
+      }
+    }
+  });
+
+  app.put('/api/appointments/:id', requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = insertAppointmentSchema.partial().parse(req.body);
+      const updated = await storage.updateAppointment(id, updates);
+      if (updated) {
+        res.json(updated);
+      } else {
+        res.status(404).json({ message: 'Agendamento não encontrado' });
+      }
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ message: 'Dados inválidos', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Erro ao atualizar agendamento' });
+      }
+    }
+  });
+
+  app.delete('/api/appointments/:id', requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deleteAppointment(id);
+      if (deleted) {
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ message: 'Agendamento não encontrado' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Erro ao deletar agendamento' });
     }
   });
 

@@ -1,4 +1,10 @@
-import { Link } from "wouter";
+import { useState } from "react";
+import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 const quickLinks = [
   { name: "Início", href: "/" },
@@ -23,6 +29,62 @@ const socialLinks = [
 ];
 
 export default function Footer() {
+  const [, setLocation] = useLocation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleAdminAccess = () => {
+    setIsModalOpen(true);
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      // Authenticate with backend only
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Acesso autorizado!",
+          description: "Redirecionando para o painel administrativo...",
+        });
+        setIsModalOpen(false);
+        setPassword("");
+        setLocation("/admin");
+      } else {
+        toast({
+          title: "Senha incorreta",
+          description: "Tente novamente.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro de acesso",
+        description: "Não foi possível acessar o painel administrativo.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      setPassword("");
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setPassword("");
+  };
+
   return (
     <footer className="bg-foreground text-background py-16">
       <div className="container mx-auto px-4">
@@ -100,15 +162,70 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-background/20 pt-8 text-center">
-          <p className="text-background/60 text-sm">
-            © 2024 Luccy Studio. Todos os direitos reservados. |{" "}
-            <Link href="/admin" className="hover:text-primary transition-colors" data-testid="link-admin">
-              Área Administrativa
-            </Link>
-          </p>
+        <div className="border-t border-background/20 pt-8">
+          <div className="flex items-center justify-between">
+            <p className="text-background/60 text-sm">
+              © 2024 Luccy Studio. Todos os direitos reservados.
+            </p>
+            <button
+              onClick={handleAdminAccess}
+              className="w-8 h-8 bg-background/10 hover:bg-primary rounded-full flex items-center justify-center transition-colors opacity-50 hover:opacity-100"
+              data-testid="button-admin-gear"
+              title="Área Administrativa"
+            >
+              <i className="fas fa-cog text-sm"></i>
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Admin Access Modal */}
+      <Dialog open={isModalOpen} onOpenChange={closeModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <i className="fas fa-lock text-primary"></i>
+              Acesso Administrativo
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="admin-password">Senha de Acesso</Label>
+              <Input
+                id="admin-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Digite a senha"
+                required
+                disabled={isLoading}
+                data-testid="input-footer-admin-password"
+                className="mt-1"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={closeModal}
+                className="flex-1"
+                disabled={isLoading}
+                data-testid="button-cancel-admin-access"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1"
+                disabled={isLoading}
+                data-testid="button-confirm-admin-access"
+              >
+                {isLoading ? "Verificando..." : "Acessar"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 }

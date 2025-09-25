@@ -3,6 +3,7 @@ import ServiceCard from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "wouter";
 
 export default function Services() {
   const { data: services, isLoading } = useQuery({
@@ -19,17 +20,29 @@ export default function Services() {
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
             Oferecemos uma gama completa de serviços de beleza com técnicas modernas e produtos de alta qualidade.
           </p>
-          <Card className="bg-primary/10 border border-primary/20 max-w-md mx-auto">
-            <CardContent className="p-4">
-              <p className="text-foreground font-semibold" data-testid="text-opening-hours">
-                <i className="fas fa-clock text-primary mr-2"></i>
-                Horários: Terça a Sábado, 9h às 21h
-              </p>
-              <p className="text-sm text-muted-foreground mt-1" data-testid="text-special-hours">
-                Horários especiais para noivas e madrinhas
-              </p>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+            <Card className="bg-primary/10 border border-primary/20">
+              <CardContent className="p-4">
+                <p className="text-foreground font-semibold" data-testid="text-opening-hours">
+                  <i className="fas fa-clock text-primary mr-2"></i>
+                  Horários: Terça a Sábado, 9h às 21h
+                </p>
+                <p className="text-sm text-muted-foreground mt-1" data-testid="text-special-hours">
+                  Horários especiais para noivas e madrinhas
+                </p>
+              </CardContent>
+            </Card>
+            <Link href="/agendamentos">
+              <Button 
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8"
+                data-testid="button-agende-aqui-services"
+              >
+                <i className="fas fa-calendar-plus mr-2"></i>
+                Agende Aqui
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">

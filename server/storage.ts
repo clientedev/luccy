@@ -1,12 +1,12 @@
 import { 
-  users, categories, products, services, testimonials, galleryImages, siteSettings,
+  users, categories, products, services, testimonials, galleryImages, siteSettings, appointments,
   type User, type InsertUser, type Category, type InsertCategory, 
   type Product, type InsertProduct, type Service, type InsertService,
   type Testimonial, type InsertTestimonial, type GalleryImage, type InsertGalleryImage,
-  type SiteSettings, type InsertSiteSettings
+  type SiteSettings, type InsertSiteSettings, type Appointment, type InsertAppointment
 } from "../shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -51,6 +51,15 @@ export interface IStorage {
   getSiteSetting(key: string): Promise<SiteSettings | undefined>;
   setSiteSetting(setting: InsertSiteSettings): Promise<SiteSettings>;
   getAllSiteSettings(): Promise<SiteSettings[]>;
+
+  // Appointments
+  getAppointments(): Promise<Appointment[]>;
+  getAppointmentsByDate(date: string): Promise<Appointment[]>;
+  getAppointmentsByService(serviceId: string): Promise<Appointment[]>;
+  createAppointment(appointment: InsertAppointment): Promise<Appointment>;
+  updateAppointment(id: string, appointment: Partial<InsertAppointment>): Promise<Appointment | undefined>;
+  deleteAppointment(id: string): Promise<boolean>;
+  getAppointmentsWithService(): Promise<(Appointment & { service: Service })[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -252,6 +261,72 @@ export class DatabaseStorage implements IStorage {
 
   async getAllSiteSettings(): Promise<SiteSettings[]> {
     return await db.select().from(siteSettings);
+  }
+
+  // Appointments
+  async getAppointments(): Promise<Appointment[]> {
+    return await db.select().from(appointments).orderBy(desc(appointments.createdAt));
+  }
+
+  async getAppointmentsByDate(date: string): Promise<Appointment[]> {
+    const startDate = new Date(date);
+    const endDate = new Date(date);
+    endDate.setDate(endDate.getDate() + 1);
+    
+    return await db.select().from(appointments)
+      .where(sql`${appointments.appointmentDate} >= ${startDate} AND ${appointments.appointmentDate} < ${endDate}`)
+      .orderBy(appointments.appointmentDate);
+  }
+
+  async getAppointmentsByService(serviceId: string): Promise<Appointment[]> {
+    return await db.select().from(appointments)
+      .where(eq(appointments.serviceId, serviceId))
+      .orderBy(appointments.appointmentDate);
+  }
+
+  async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
+    const [newAppointment] = await db
+      .insert(appointments)
+      .values(appointment)
+      .returning();
+    return newAppointment;
+  }
+
+  async updateAppointment(id: string, appointment: Partial<InsertAppointment>): Promise<Appointment | undefined> {
+    const [updated] = await db
+      .update(appointments)
+      .set(appointment)
+      .where(eq(appointments.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteAppointment(id: string): Promise<boolean> {
+    const result = await db.delete(appointments).where(eq(appointments.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async getAppointmentsWithService(): Promise<(Appointment & { service: Service })[]> {
+    const result = await db
+      .select({
+        id: appointments.id,
+        clientName: appointments.clientName,
+        clientPhone: appointments.clientPhone,
+        serviceId: appointments.serviceId,
+        appointmentDate: appointments.appointmentDate,
+        status: appointments.status,
+        notes: appointments.notes,
+        createdAt: appointments.createdAt,
+        service: services
+      })
+      .from(appointments)
+      .leftJoin(services, eq(appointments.serviceId, services.id))
+      .orderBy(appointments.appointmentDate);
+    
+    return result.map(row => ({
+      ...row,
+      service: row.service!
+    }));
   }
 }
 

@@ -88,6 +88,190 @@ function LoginForm({ onLogin }: LoginFormProps) {
   );
 }
 
+function AppointmentsManagement() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: appointments, isLoading } = useQuery({
+    queryKey: ["/api/appointments", "admin"],
+    queryFn: () => fetch("/api/appointments?admin=true").then(res => res.json()),
+  });
+
+  const { data: services } = useQuery({
+    queryKey: ["/api/services"],
+  });
+
+  const updateAppointmentMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      fetch(`/api/appointments/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).then(res => res.json()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      toast({ title: "Agendamento atualizado com sucesso!" });
+    },
+    onError: () => {
+      toast({ title: "Erro ao atualizar agendamento", variant: "destructive" });
+    },
+  });
+
+  const deleteAppointmentMutation = useMutation({
+    mutationFn: (id: string) =>
+      fetch(`/api/appointments/${id}`, { method: "DELETE" }).then(res => res.json()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      toast({ title: "Agendamento excluído com sucesso!" });
+    },
+    onError: () => {
+      toast({ title: "Erro ao excluir agendamento", variant: "destructive" });
+    },
+  });
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      pending: { label: "Pendente", variant: "secondary" as const },
+      confirmed: { label: "Confirmado", variant: "default" as const },
+      completed: { label: "Concluído", variant: "outline" as const },
+      cancelled: { label: "Cancelado", variant: "destructive" as const },
+    };
+    return statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  };
+
+  const handleStatusChange = (appointmentId: string, newStatus: string) => {
+    updateAppointmentMutation.mutate({
+      id: appointmentId,
+      data: { status: newStatus }
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Agendamentos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-20 bg-muted animate-pulse rounded" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span>Gerenciar Agendamentos</span>
+          <Badge variant="secondary" data-testid="appointments-count">
+            {Array.isArray(appointments) ? appointments.length : 0} agendamentos
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {!Array.isArray(appointments) || appointments.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <i className="fas fa-calendar-times text-4xl mb-4 block"></i>
+            <p>Nenhum agendamento encontrado</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {appointments.map((appointment: any) => (
+              <Card key={appointment.id} className="border-l-4 border-l-primary">
+                <CardContent className="pt-4">
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground">{appointment.clientName}</h4>
+                      <p className="text-sm text-muted-foreground">{appointment.clientPhone}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        <i className="fas fa-calendar mr-1"></i>
+                        {formatDate(appointment.appointmentDate)}
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <p className="font-medium">{appointment.service?.name || 'Serviço não encontrado'}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {appointment.service?.duration && `Duração: ${appointment.service.duration}`}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {appointment.service?.price && `Preço: ${appointment.service.price}`}
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={getStatusBadge(appointment.status).variant}
+                          data-testid={`status-${appointment.id}`}
+                        >
+                          {getStatusBadge(appointment.status).label}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2">
+                        <Select
+                          value={appointment.status}
+                          onValueChange={(newStatus) => handleStatusChange(appointment.id, newStatus)}
+                        >
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pendente</SelectItem>
+                            <SelectItem value="confirmed">Confirmar</SelectItem>
+                            <SelectItem value="completed">Concluir</SelectItem>
+                            <SelectItem value="cancelled">Cancelar</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => {
+                            if (confirm('Tem certeza que deseja excluir este agendamento?')) {
+                              deleteAppointmentMutation.mutate(appointment.id);
+                            }
+                          }}
+                          data-testid={`delete-appointment-${appointment.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      
+                      {appointment.notes && (
+                        <div className="text-sm">
+                          <strong>Observações:</strong> {appointment.notes}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function ServicesManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState<any>(null);
@@ -910,13 +1094,18 @@ export default function Admin() {
           </Button>
         </div>
 
-        <Tabs defaultValue="services" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="appointments" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="appointments" data-testid="tab-appointments">Agendamentos</TabsTrigger>
             <TabsTrigger value="services" data-testid="tab-services">Serviços</TabsTrigger>
             <TabsTrigger value="products" data-testid="tab-products">Produtos</TabsTrigger>
             <TabsTrigger value="testimonials" data-testid="tab-testimonials">Depoimentos</TabsTrigger>
             <TabsTrigger value="gallery" data-testid="tab-gallery">Galeria</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="appointments">
+            <AppointmentsManagement />
+          </TabsContent>
 
           <TabsContent value="services">
             <ServicesManagement />

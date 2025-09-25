@@ -65,6 +65,17 @@ export const siteSettings = pgTable("site_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const appointments = pgTable("appointments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  clientName: text("client_name").notNull(),
+  clientPhone: text("client_phone").notNull(),
+  serviceId: varchar("service_id").references(() => services.id).notNull(),
+  appointmentDate: timestamp("appointment_date").notNull(),
+  status: text("status").default("pending"), // pending, confirmed, completed, cancelled
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const productsRelations = relations(products, ({ one }) => ({
   category: one(categories, {
@@ -75,6 +86,17 @@ export const productsRelations = relations(products, ({ one }) => ({
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
   products: many(products),
+}));
+
+export const servicesRelations = relations(services, ({ many }) => ({
+  appointments: many(appointments),
+}));
+
+export const appointmentsRelations = relations(appointments, ({ one }) => ({
+  service: one(services, {
+    fields: [appointments.serviceId],
+    references: [services.id],
+  }),
 }));
 
 // Insert schemas
@@ -112,6 +134,11 @@ export const insertSiteSettingsSchema = createInsertSchema(siteSettings).omit({
   updatedAt: true,
 });
 
+export const insertAppointmentSchema = createInsertSchema(appointments).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -133,3 +160,6 @@ export type InsertGalleryImage = z.infer<typeof insertGalleryImageSchema>;
 
 export type SiteSettings = typeof siteSettings.$inferSelect;
 export type InsertSiteSettings = z.infer<typeof insertSiteSettingsSchema>;
+
+export type Appointment = typeof appointments.$inferSelect;
+export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;

@@ -11,6 +11,7 @@ import Products from "@/pages/Products";
 import Gallery from "@/pages/Gallery";
 import Contact from "@/pages/Contact";
 import Admin from "@/pages/Admin";
+import Agendamentos from "@/pages/Agendamentos";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/produtos" component={Products} />
       <Route path="/galeria" component={Gallery} />
       <Route path="/contato" component={Contact} />
+      <Route path="/agendamentos" component={Agendamentos} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
