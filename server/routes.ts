@@ -431,7 +431,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/appointments', async (req, res) => {
     try {
-      const appointment = insertAppointmentSchema.parse(req.body);
+      // Preprocess appointment data to handle date conversion
+      const requestBody = { ...req.body };
+      if (requestBody.appointmentDate && typeof requestBody.appointmentDate === 'string') {
+        const parsedDate = new Date(requestBody.appointmentDate);
+        // Validate that the date conversion was successful
+        if (isNaN(parsedDate.getTime())) {
+          return res.status(400).json({ message: 'Data de agendamento inválida' });
+        }
+        requestBody.appointmentDate = parsedDate;
+      }
+      
+      // Validate with Zod schema
+      const appointment = insertAppointmentSchema.parse(requestBody);
       const newAppointment = await storage.createAppointment(appointment);
       res.status(201).json(newAppointment);
     } catch (error) {
