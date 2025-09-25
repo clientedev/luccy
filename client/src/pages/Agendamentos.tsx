@@ -105,43 +105,60 @@ export default function Agendamentos() {
     const endHour = 21; // 9:00 PM
     const serviceDurationMinutes = parseDurationToMinutes(selectedServiceData.duration);
     
-    for (let hour = startHour; hour < endHour; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const slotTime = new Date(selectedDate);
-        slotTime.setHours(hour, minute, 0, 0);
-        
-        // Check if slot is in the past
-        if (isBefore(slotTime, new Date())) continue;
-        
-        // Check if slot conflicts with existing CONFIRMED appointments only
-        const isBooked = Array.isArray(existingAppointments) && existingAppointments.some((apt: any) => {
-          // Only consider confirmed and completed appointments as blocking
-          if (apt.status !== 'confirmed' && apt.status !== 'completed') {
-            return false;
-          }
-          
-          // Find the service details for this appointment to get correct duration
-          const aptService = Array.isArray(services) ? services.find((s: any) => s.id === apt.serviceId) : null;
-          const aptDurationMinutes = aptService ? parseDurationToMinutes(aptService.duration) : 60;
-          
-          const aptTime = new Date(apt.appointmentDate);
-          const aptEndTime = addMinutes(aptTime, aptDurationMinutes); // Use appointment's own service duration
-          const slotEndTime = addMinutes(slotTime, serviceDurationMinutes); // Use selected service duration for slot
-          
-          return (
-            (slotTime >= aptTime && slotTime < aptEndTime) ||
-            (slotEndTime > aptTime && slotEndTime <= aptEndTime) ||
-            (slotTime <= aptTime && slotEndTime >= aptEndTime)
-          );
-        });
-        
-        if (!isBooked) {
-          slots.push({
-            time: format(slotTime, "HH:mm"),
-            datetime: slotTime
-          });
-        }
+    // Calculate slot intervals based on service duration to avoid overlaps
+    const slotInterval = Math.max(30, Math.ceil(serviceDurationMinutes / 30) * 30); // Round up to nearest 30 minutes
+    
+    // Generate slots by time intervals to avoid overlaps
+    const startOfDay = new Date(selectedDate);
+    startOfDay.setHours(startHour, 0, 0, 0);
+    const endOfWorkDay = new Date(selectedDate);
+    endOfWorkDay.setHours(endHour, 0, 0, 0);
+    
+    let currentTime = new Date(startOfDay);
+    
+    while (currentTime < endOfWorkDay) {
+      const slotTime = new Date(currentTime);
+      const slotEndTime = addMinutes(slotTime, serviceDurationMinutes);
+      
+      // Check if this slot would extend past working hours
+      if (slotEndTime > endOfWorkDay) break;
+      
+      // Check if slot is in the past
+      if (isBefore(slotTime, new Date())) {
+        currentTime = addMinutes(currentTime, slotInterval);
+        continue;
       }
+      
+      // Check if slot conflicts with existing appointments (including pending ones)
+      const isBooked = Array.isArray(existingAppointments) && existingAppointments.some((apt: any) => {
+        // Consider all appointments except cancelled ones as blocking
+        if (apt.status === 'cancelled') {
+          return false;
+        }
+        
+        // Find the service details for this appointment to get correct duration
+        const aptService = Array.isArray(services) ? services.find((s: any) => s.id === apt.serviceId) : null;
+        const aptDurationMinutes = aptService ? parseDurationToMinutes(aptService.duration) : 60;
+        
+        const aptTime = new Date(apt.appointmentDate);
+        const aptEndTime = addMinutes(aptTime, aptDurationMinutes); // Use appointment's own service duration
+        
+        return (
+          (slotTime >= aptTime && slotTime < aptEndTime) ||
+          (slotEndTime > aptTime && slotEndTime <= aptEndTime) ||
+          (slotTime <= aptTime && slotEndTime >= aptEndTime)
+        );
+      });
+      
+      if (!isBooked) {
+        slots.push({
+          time: format(slotTime, "HH:mm"),
+          datetime: slotTime
+        });
+      }
+      
+      // Move to next slot interval
+      currentTime = addMinutes(currentTime, slotInterval);
     }
     
     return slots;

@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { Trash2, Edit, Plus, Eye, EyeOff, LogOut } from "lucide-react";
+import { SiWhatsapp } from "react-icons/si";
 
 interface LoginFormProps {
   onLogin: () => void;
@@ -157,6 +158,43 @@ function AppointmentsManagement() {
     });
   };
 
+  const generateWhatsAppMessage = (appointment: any) => {
+    const date = new Date(appointment.appointmentDate);
+    const formattedDate = new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
+    const formattedTime = new Intl.DateTimeFormat('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+
+    const serviceName = appointment.service?.name || 'serviço solicitado';
+    
+    // Generate dynamic message based on appointment status
+    switch (appointment.status) {
+      case 'confirmed':
+        return `Olá ${appointment.clientName}! Seu agendamento foi confirmado para o serviço de ${serviceName} no dia ${formattedDate} às ${formattedTime}. Aguardamos você no Luccy Studio! 💅✨`;
+      case 'pending':
+        return `Olá ${appointment.clientName}! Recebemos sua solicitação de agendamento para o serviço de ${serviceName} no dia ${formattedDate} às ${formattedTime}. Em breve entraremos em contato para confirmar! 💅`;
+      case 'completed':
+        return `Olá ${appointment.clientName}! Obrigada por escolher o Luccy Studio! Esperamos que tenha gostado do serviço de ${serviceName}. Conte conosco sempre! 💅✨`;
+      case 'cancelled':
+        return `Olá ${appointment.clientName}! Seu agendamento para o serviço de ${serviceName} foi cancelado. Se desejar reagendar, fique à vontade para entrar em contato! 💅`;
+      default:
+        return `Olá ${appointment.clientName}! Entrando em contato sobre seu agendamento para o serviço de ${serviceName} no dia ${formattedDate} às ${formattedTime}. 💅`;
+    }
+  };
+
+  const openWhatsApp = (appointment: any) => {
+    const phone = appointment.clientPhone.replace(/\D/g, ''); // Remove caracteres não numéricos
+    const formattedPhone = phone.startsWith('55') ? phone : `55${phone}`;
+    const message = encodeURIComponent(generateWhatsAppMessage(appointment));
+    const url = `https://wa.me/${formattedPhone}?text=${message}`;
+    window.open(url, '_blank');
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -240,6 +278,17 @@ function AppointmentsManagement() {
                             <SelectItem value="cancelled">Cancelar</SelectItem>
                           </SelectContent>
                         </Select>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openWhatsApp(appointment)}
+                          className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
+                          data-testid={`whatsapp-appointment-${appointment.id}`}
+                        >
+                          <SiWhatsapp className="w-4 h-4 mr-1" />
+                          WhatsApp
+                        </Button>
                         
                         <Button
                           variant="destructive"
@@ -649,7 +698,7 @@ function ProductsManagement() {
                     <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories?.map((category: any) => (
+                    {Array.isArray(categories) && categories.map((category: any) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name}
                       </SelectItem>
