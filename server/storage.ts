@@ -330,4 +330,310 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// In-memory storage for development/demo
+export class MemoryStorage implements IStorage {
+  private users: Map<string, User> = new Map();
+  private categories: Map<string, Category> = new Map();
+  private products: Map<string, Product> = new Map();
+  private services: Map<string, Service> = new Map();
+  private testimonials: Map<string, Testimonial> = new Map();
+  private galleryImages: Map<string, GalleryImage> = new Map();
+  private siteSettings: Map<string, SiteSettings> = new Map();
+  private appointments: Map<string, Appointment> = new Map();
+
+  private generateId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
+  // Users
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const usersList = Array.from(this.users.values());
+    for (const user of usersList) {
+      if (user.username === username) {
+        return user;
+      }
+    }
+    return undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const user: User = {
+      id: this.generateId(),
+      ...insertUser
+    };
+    this.users.set(user.id, user);
+    return user;
+  }
+
+  // Categories
+  async getCategories(): Promise<Category[]> {
+    return Array.from(this.categories.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async createCategory(category: InsertCategory): Promise<Category> {
+    const newCategory: Category = {
+      id: this.generateId(),
+      name: category.name,
+      slug: category.slug,
+      description: category.description ?? null,
+      createdAt: new Date()
+    };
+    this.categories.set(newCategory.id, newCategory);
+    return newCategory;
+  }
+
+  async updateCategory(id: string, category: Partial<InsertCategory>): Promise<Category | undefined> {
+    const existing = this.categories.get(id);
+    if (!existing) return undefined;
+    
+    const updated = { ...existing, ...category };
+    this.categories.set(id, updated);
+    return updated;
+  }
+
+  async deleteCategory(id: string): Promise<boolean> {
+    return this.categories.delete(id);
+  }
+
+  // Products
+  async getProducts(): Promise<Product[]> {
+    return Array.from(this.products.values()).sort((a, b) => 
+      (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
+    );
+  }
+
+  async getProductsByCategory(categoryId: string): Promise<Product[]> {
+    return Array.from(this.products.values())
+      .filter(p => p.categoryId === categoryId)
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async createProduct(product: InsertProduct): Promise<Product> {
+    const newProduct: Product = {
+      id: this.generateId(),
+      name: product.name,
+      description: product.description ?? null,
+      price: product.price,
+      categoryId: product.categoryId ?? null,
+      imageUrl: product.imageUrl ?? null,
+      inStock: product.inStock ?? null,
+      createdAt: new Date()
+    };
+    this.products.set(newProduct.id, newProduct);
+    return newProduct;
+  }
+
+  async updateProduct(id: string, product: Partial<InsertProduct>): Promise<Product | undefined> {
+    const existing = this.products.get(id);
+    if (!existing) return undefined;
+    
+    const updated = { ...existing, ...product };
+    this.products.set(id, updated);
+    return updated;
+  }
+
+  async deleteProduct(id: string): Promise<boolean> {
+    return this.products.delete(id);
+  }
+
+  // Services
+  async getServices(): Promise<Service[]> {
+    return Array.from(this.services.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async createService(service: InsertService): Promise<Service> {
+    const newService: Service = {
+      id: this.generateId(),
+      name: service.name,
+      description: service.description ?? null,
+      price: service.price ?? null,
+      duration: service.duration ?? null,
+      featured: service.featured ?? null,
+      createdAt: new Date()
+    };
+    this.services.set(newService.id, newService);
+    return newService;
+  }
+
+  async updateService(id: string, service: Partial<InsertService>): Promise<Service | undefined> {
+    const existing = this.services.get(id);
+    if (!existing) return undefined;
+    
+    const updated = { ...existing, ...service };
+    this.services.set(id, updated);
+    return updated;
+  }
+
+  async deleteService(id: string): Promise<boolean> {
+    return this.services.delete(id);
+  }
+
+  // Testimonials
+  async getApprovedTestimonials(): Promise<Testimonial[]> {
+    return Array.from(this.testimonials.values())
+      .filter(t => t.approved)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async getAllTestimonials(): Promise<Testimonial[]> {
+    return Array.from(this.testimonials.values())
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial> {
+    const newTestimonial: Testimonial = {
+      id: this.generateId(),
+      clientName: testimonial.clientName,
+      content: testimonial.content,
+      rating: testimonial.rating ?? null,
+      service: testimonial.service ?? null,
+      approved: testimonial.approved ?? null,
+      createdAt: new Date()
+    };
+    this.testimonials.set(newTestimonial.id, newTestimonial);
+    return newTestimonial;
+  }
+
+  async updateTestimonial(id: string, testimonial: Partial<InsertTestimonial>): Promise<Testimonial | undefined> {
+    const existing = this.testimonials.get(id);
+    if (!existing) return undefined;
+    
+    const updated = { ...existing, ...testimonial };
+    this.testimonials.set(id, updated);
+    return updated;
+  }
+
+  async deleteTestimonial(id: string): Promise<boolean> {
+    return this.testimonials.delete(id);
+  }
+
+  // Gallery
+  async getGalleryImages(): Promise<GalleryImage[]> {
+    return Array.from(this.galleryImages.values())
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async getFeaturedGalleryImages(): Promise<GalleryImage[]> {
+    return Array.from(this.galleryImages.values())
+      .filter(img => img.featured)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async createGalleryImage(image: InsertGalleryImage): Promise<GalleryImage> {
+    const newImage: GalleryImage = {
+      id: this.generateId(),
+      title: image.title ?? null,
+      imageUrl: image.imageUrl,
+      category: image.category ?? null,
+      featured: image.featured ?? null,
+      createdAt: new Date()
+    };
+    this.galleryImages.set(newImage.id, newImage);
+    return newImage;
+  }
+
+  async updateGalleryImage(id: string, image: Partial<InsertGalleryImage>): Promise<GalleryImage | undefined> {
+    const existing = this.galleryImages.get(id);
+    if (!existing) return undefined;
+    
+    const updated = { ...existing, ...image };
+    this.galleryImages.set(id, updated);
+    return updated;
+  }
+
+  async deleteGalleryImage(id: string): Promise<boolean> {
+    return this.galleryImages.delete(id);
+  }
+
+  // Site Settings
+  async getSiteSetting(key: string): Promise<SiteSettings | undefined> {
+    return this.siteSettings.get(key);
+  }
+
+  async setSiteSetting(setting: InsertSiteSettings): Promise<SiteSettings> {
+    const newSetting: SiteSettings = {
+      id: this.generateId(),
+      key: setting.key,
+      value: setting.value ?? null,
+      updatedAt: new Date()
+    };
+    this.siteSettings.set(setting.key, newSetting);
+    return newSetting;
+  }
+
+  async getAllSiteSettings(): Promise<SiteSettings[]> {
+    return Array.from(this.siteSettings.values());
+  }
+
+  // Appointments
+  async getAppointments(): Promise<Appointment[]> {
+    return Array.from(this.appointments.values())
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async getAppointmentsByDate(date: string): Promise<Appointment[]> {
+    const targetDate = new Date(date);
+    const nextDay = new Date(date);
+    nextDay.setDate(nextDay.getDate() + 1);
+    
+    return Array.from(this.appointments.values())
+      .filter(apt => {
+        const aptDate = new Date(apt.appointmentDate);
+        return aptDate >= targetDate && aptDate < nextDay;
+      })
+      .sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime());
+  }
+
+  async getAppointmentsByService(serviceId: string): Promise<Appointment[]> {
+    return Array.from(this.appointments.values())
+      .filter(apt => apt.serviceId === serviceId)
+      .sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime());
+  }
+
+  async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
+    const newAppointment: Appointment = {
+      id: this.generateId(),
+      clientName: appointment.clientName,
+      clientPhone: appointment.clientPhone,
+      serviceId: appointment.serviceId,
+      appointmentDate: appointment.appointmentDate,
+      status: appointment.status ?? null,
+      notes: appointment.notes ?? null,
+      createdAt: new Date()
+    };
+    this.appointments.set(newAppointment.id, newAppointment);
+    return newAppointment;
+  }
+
+  async updateAppointment(id: string, appointment: Partial<InsertAppointment>): Promise<Appointment | undefined> {
+    const existing = this.appointments.get(id);
+    if (!existing) return undefined;
+    
+    const updated = { ...existing, ...appointment };
+    this.appointments.set(id, updated);
+    return updated;
+  }
+
+  async deleteAppointment(id: string): Promise<boolean> {
+    return this.appointments.delete(id);
+  }
+
+  async getAppointmentsWithService(): Promise<(Appointment & { service: Service })[]> {
+    const appointments = Array.from(this.appointments.values());
+    return appointments.map(apt => {
+      const service = this.services.get(apt.serviceId);
+      return {
+        ...apt,
+        service: service!
+      };
+    }).filter(apt => apt.service) // Only include appointments with valid services
+      .sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime());
+  }
+}
+
+// Use in-memory storage for development, fallback to database if needed
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemoryStorage();
