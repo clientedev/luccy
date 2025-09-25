@@ -60,14 +60,50 @@ export default function Agendamentos() {
   // Get service details
   const selectedServiceData = Array.isArray(services) ? services.find((s: any) => s.id === selectedService) : undefined;
 
+  // Parse duration string to minutes
+  const parseDurationToMinutes = (durationStr: string): number => {
+    if (!durationStr) return 60;
+    
+    // Clean the string and convert to lowercase
+    const cleaned = durationStr.toLowerCase().replace(/\s+/g, '');
+    
+    // Handle various formats: "90", "90min", "1h", "45m", "1h30m"
+    let totalMinutes = 0;
+    
+    // Extract hours
+    const hourMatch = cleaned.match(/(\d+)h/);
+    if (hourMatch) {
+      totalMinutes += parseInt(hourMatch[1]) * 60;
+    }
+    
+    // Extract minutes
+    const minMatch = cleaned.match(/(\d+)m(?!in)/); // Match 'm' but not 'min'
+    if (minMatch) {
+      totalMinutes += parseInt(minMatch[1]);
+    }
+    
+    // Handle pure numbers or "90min" format
+    if (totalMinutes === 0) {
+      const numMatch = cleaned.match(/(\d+)/);
+      if (numMatch) {
+        const num = parseInt(numMatch[1]);
+        // If it's a reasonable number for minutes (30-180), treat as minutes
+        // Otherwise treat as hours
+        totalMinutes = num > 10 && num <= 180 ? num : num * 60;
+      }
+    }
+    
+    return totalMinutes || 60; // Default to 60 minutes if nothing matches
+  };
+
   // Generate available time slots
   const generateTimeSlots = () => {
-    if (!selectedDate || !selectedServiceData?.duration) return [];
+    if (!selectedDate || !selectedServiceData?.duration || !services) return [];
     
     const slots = [];
     const startHour = 9; // 9:00 AM
     const endHour = 21; // 9:00 PM
-    const serviceDurationMinutes = parseInt(selectedServiceData.duration.replace(/\D/g, '')) || 60;
+    const serviceDurationMinutes = parseDurationToMinutes(selectedServiceData.duration);
     
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
@@ -77,11 +113,20 @@ export default function Agendamentos() {
         // Check if slot is in the past
         if (isBefore(slotTime, new Date())) continue;
         
-        // Check if slot conflicts with existing appointments
+        // Check if slot conflicts with existing CONFIRMED appointments only
         const isBooked = Array.isArray(existingAppointments) && existingAppointments.some((apt: any) => {
+          // Only consider confirmed and completed appointments as blocking
+          if (apt.status !== 'confirmed' && apt.status !== 'completed') {
+            return false;
+          }
+          
+          // Find the service details for this appointment to get correct duration
+          const aptService = Array.isArray(services) ? services.find((s: any) => s.id === apt.serviceId) : null;
+          const aptDurationMinutes = aptService ? parseDurationToMinutes(aptService.duration) : 60;
+          
           const aptTime = new Date(apt.appointmentDate);
-          const aptEndTime = addMinutes(aptTime, serviceDurationMinutes);
-          const slotEndTime = addMinutes(slotTime, serviceDurationMinutes);
+          const aptEndTime = addMinutes(aptTime, aptDurationMinutes); // Use appointment's own service duration
+          const slotEndTime = addMinutes(slotTime, serviceDurationMinutes); // Use selected service duration for slot
           
           return (
             (slotTime >= aptTime && slotTime < aptEndTime) ||
