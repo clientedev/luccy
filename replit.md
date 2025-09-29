@@ -139,3 +139,54 @@ Preferred communication style: Simple, everyday language.
 - Configurado para deploy no Railway com PostgreSQL
 - Workflow otimizado para desenvolvimento com diagnóstico automático
 - Sistema de migração automática garante banco sempre configurado corretamente
+
+### Problema 4: Login Admin não Funcionava em Produção (Railway) - Setembro 2025
+- **Problema**: Após fazer login no painel admin em produção, o sistema ficava preso na tela de login sem acessar a área administrativa
+- **Causa**: Configuração inadequada de sessões e cookies para ambientes com proxy reverso (Railway usa proxies)
+  - Cookie `secure: true` em produção requer HTTPS (correto)
+  - Faltava `trust proxy` no Express para reconhecer o proxy do Railway
+  - Cookie `sameSite` precisava ser configurado para 'none' em produção
+  - Faltava `proxy: true` na configuração de sessão
+- **Solução Implementada em `server/routes.ts`**:
+  ```typescript
+  // Trust proxy for Railway deployment
+  if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+  }
+  
+  // Session configuration with proxy support
+  app.use(session({
+    store: new PgSession({
+      pool: pool,
+      tableName: 'session',
+      createTableIfMissing: true
+    }),
+    secret: process.env.SESSION_SECRET || fallback,
+    resave: false,
+    saveUninitialized: false,
+    proxy: process.env.NODE_ENV === 'production',
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    }
+  }));
+  ```
+- **Impacto**: Login admin agora funciona corretamente em produção no Railway. Sessões são mantidas corretamente através do proxy reverso.
+
+## Verificação de Sistemas (Setembro 2025)
+Todos os sistemas foram testados e estão funcionando corretamente:
+- ✅ **Autenticação Admin**: Login/logout funcionando em desenvolvimento e produção
+- ✅ **Agendamentos**: Sistema completo de agendamento com:
+  - Seleção de data e horário
+  - Verificação de horários disponíveis
+  - Detecção de conflitos
+  - Integração com WhatsApp
+- ✅ **Serviços**: CRUD completo com:
+  - Criação automática de horários de atendimento
+  - Edição e exclusão
+  - Marcação de serviços em destaque
+- ✅ **Produtos**: Sistema de produtos com categorização
+- ✅ **Depoimentos**: Sistema de aprovação e gerenciamento de depoimentos
+- ✅ **Galeria**: Upload e gerenciamento de imagens da galeria
