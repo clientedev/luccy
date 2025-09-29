@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
+import { ensureDatabaseSetup, diagnoseDatabaseIssues } from "./migrate";
 
 const app = express();
 app.use(express.json());
@@ -38,9 +39,15 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database seed data
-  // Note: Database migrations should be run separately before deployment
-  // using: npm run db:push
+  // 1. Verificar e configurar banco de dados
+  await ensureDatabaseSetup();
+  
+  // 2. Executar diagnóstico (apenas em desenvolvimento)
+  if (app.get("env") === "development") {
+    await diagnoseDatabaseIssues();
+  }
+
+  // 3. Initialize database seed data
   try {
     if (typeof (storage as any).initializeSeedData === 'function') {
       log('Initializing database seed data...');
