@@ -93,7 +93,7 @@ export default function Home() {
             {/* Desktop Version */}
             <h1 className="hidden md:block font-serif-luxury text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-gold-bright">
               Transforme sua Beleza,<br />
-              <span className="text-nude">Realce sua Essência</span>
+              <span className="text-black">Realce sua Essência</span>
             </h1>
             
             {/* Subtítulo */}
@@ -104,7 +104,7 @@ export default function Home() {
             
             {/* CTA Principal */}
             <div>
-              <Button asChild className="cta-luxury bg-black text-white hover:bg-black hover:text-white font-sans-modern px-12 py-6 text-xl rounded-full font-semibold" data-testid="button-schedule">
+              <Button asChild className="cta-luxury cta-pulse bg-black text-white hover:bg-black hover:text-white font-sans-modern px-12 py-6 text-xl rounded-full font-semibold" data-testid="button-schedule">
                 <Link href="/agendamentos">
                   <i className="fas fa-calendar-alt text-2xl mr-3"></i>
                   Agende seu Horário

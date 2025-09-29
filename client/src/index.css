@@ -162,6 +162,19 @@
     transform: translate(-50%, -50%);
     object-fit: cover;
     z-index: 0;
+    animation: videoFadeInOut 1s ease-in-out;
+  }
+
+  @keyframes videoFadeInOut {
+    0% {
+      opacity: 1;
+    }
+    98% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.95;
+    }
   }
 
   /* Mobile hero section */
@@ -198,6 +211,25 @@
     color: var(--white, #FFFFFF) !important;
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  .cta-pulse {
+    animation: ctaPulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes ctaPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+      transform: scale(1.03);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .cta-pulse:hover {
+    animation: none;
   }
 
   .text-nude {
