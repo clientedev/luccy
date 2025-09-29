@@ -109,7 +109,13 @@ function AppointmentsManagement() {
 
   const { data: appointments, isLoading } = useQuery({
     queryKey: ["/api/appointments", "admin"],
-    queryFn: () => fetch("/api/appointments?admin=true").then(res => res.json()),
+    queryFn: async () => {
+      const res = await fetch("/api/appointments?admin=true", {
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Failed to fetch appointments");
+      return res.json();
+    },
   });
 
   const { data: services } = useQuery({
@@ -118,11 +124,7 @@ function AppointmentsManagement() {
 
   const updateAppointmentMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
-      fetch(`/api/appointments/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      }).then(res => res.json()),
+      apiRequest("PUT", `/api/appointments/${id}`, data).then(res => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       toast({ title: "Agendamento atualizado com sucesso!" });
@@ -134,7 +136,7 @@ function AppointmentsManagement() {
 
   const deleteAppointmentMutation = useMutation({
     mutationFn: (id: string) =>
-      fetch(`/api/appointments/${id}`, { method: "DELETE" }).then(res => res.json()),
+      apiRequest("DELETE", `/api/appointments/${id}`).then(res => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       toast({ title: "Agendamento excluído com sucesso!" });
@@ -354,40 +356,63 @@ function ServicesManagement() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("POST", "/api/services", data),
+    mutationFn: async (data: any) => {
+      const res = await apiRequest("POST", "/api/services", data);
+      return res.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/services"] });
       setIsDialogOpen(false);
       resetForm();
       toast({ title: "Serviço criado com sucesso!" });
     },
-    onError: () => {
-      toast({ title: "Erro ao criar serviço", variant: "destructive" });
+    onError: (error: any) => {
+      console.error("Erro ao criar serviço:", error);
+      toast({ 
+        title: "Erro ao criar serviço", 
+        description: error.message || "Verifique os dados e tente novamente",
+        variant: "destructive" 
+      });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
-      apiRequest("PUT", `/api/services/${id}`, data),
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const res = await apiRequest("PUT", `/api/services/${id}`, data);
+      return res.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/services"] });
       setIsDialogOpen(false);
       resetForm();
       toast({ title: "Serviço atualizado com sucesso!" });
     },
-    onError: () => {
-      toast({ title: "Erro ao atualizar serviço", variant: "destructive" });
+    onError: (error: any) => {
+      console.error("Erro ao atualizar serviço:", error);
+      toast({ 
+        title: "Erro ao atualizar serviço", 
+        description: error.message || "Verifique os dados e tente novamente",
+        variant: "destructive" 
+      });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/services/${id}`),
+    mutationFn: async (id: string) => {
+      const res = await apiRequest("DELETE", `/api/services/${id}`);
+      return res.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/services"] });
       toast({ title: "Serviço excluído com sucesso!" });
     },
-    onError: () => {
-      toast({ title: "Erro ao excluir serviço", variant: "destructive" });
+    onError: (error: any) => {
+      console.error("Erro ao excluir serviço:", error);
+      toast({ 
+        title: "Erro ao excluir serviço", 
+        description: error.message || "Não foi possível excluir o serviço",
+        variant: "destructive" 
+      });
     },
   });
 
@@ -836,7 +861,14 @@ function TestimonialsManagement() {
   const { toast } = useToast();
 
   const { data: testimonials, isLoading } = useQuery({
-    queryKey: ["/api/testimonials", { admin: "true" }],
+    queryKey: ["/api/testimonials", "admin"],
+    queryFn: async () => {
+      const res = await fetch("/api/testimonials?admin=true", {
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Failed to fetch testimonials");
+      return res.json();
+    },
   });
 
   const updateMutation = useMutation({
