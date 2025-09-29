@@ -23,6 +23,7 @@ type TestimonialForm = z.infer<typeof testimonialFormSchema>;
 
 export default function Home() {
   const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
+  const [showVideoOverlay, setShowVideoOverlay] = useState(true);
   const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
@@ -71,83 +72,56 @@ export default function Home() {
 
   const whatsappUrl = "https://wa.me/5511944555381?text=Olá! Gostaria de agendar um horário no Luccy Studio";
 
-  // Force video autoplay on mobile (especially iOS) - aggressive approach
-  useEffect(() => {
-    const attemptAutoplay = async (video: HTMLVideoElement) => {
-      if (!video) return;
-      
-      try {
-        // Ensure muted and inline playback
-        video.muted = true;
-        video.defaultMuted = true;
-        video.setAttribute('playsinline', 'true');
-        video.setAttribute('webkit-playsinline', 'true');
-        video.setAttribute('x5-playsinline', 'true');
-        
-        // Load the video
-        video.load();
-        
-        // Wait a bit for the video to be ready
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Try to play
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          await playPromise;
-        }
-      } catch (error) {
-        // Silently fail - will retry on interaction
-      }
-    };
-
-    const playAllVideos = async () => {
-      const videos = [mobileVideoRef.current, desktopVideoRef.current].filter((v): v is HTMLVideoElement => v !== null);
-      for (const video of videos) {
-        await attemptAutoplay(video);
-      }
-    };
-
-    // Try multiple times with increasing delays
-    playAllVideos();
-    setTimeout(playAllVideos, 500);
-    setTimeout(playAllVideos, 1000);
-
-    // Handle any user interaction
-    const handleInteraction = () => {
-      const videos = [mobileVideoRef.current, desktopVideoRef.current].filter(Boolean);
-      
-      videos.forEach(async (video) => {
-        if (video && video.paused) {
-          try {
-            video.muted = true;
-            await video.play();
-          } catch (e) {
-            // Ignore
-          }
-        }
-      });
-    };
-
-    // Listen for user interaction
-    const events = ['touchstart', 'touchend', 'click', 'scroll', 'mousemove'];
-    const eventOptions = { once: true, passive: true, capture: true };
+  // Play video on user interaction
+  const handleVideoPlay = async () => {
+    const videos = [mobileVideoRef.current, desktopVideoRef.current].filter((v): v is HTMLVideoElement => v !== null);
     
-    events.forEach(event => {
-      document.addEventListener(event, handleInteraction, eventOptions);
-    });
+    for (const video of videos) {
+      if (video) {
+        video.muted = true;
+        video.volume = 0;
+        try {
+          await video.play();
+          setShowVideoOverlay(false);
+        } catch (e) {
+          // Ignore
+        }
+      }
+    }
+  };
 
-    // Cleanup
-    return () => {
-      events.forEach(event => {
-        document.removeEventListener(event, handleInteraction);
-      });
-    };
+  // Try autoplay on mount (works on desktop)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleVideoPlay();
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="hero-sophisticated min-h-screen flex items-center justify-center">
+        {/* Tap to play overlay - apenas mobile */}
+        {showVideoOverlay && (
+          <div 
+            onClick={handleVideoPlay}
+            onTouchStart={handleVideoPlay}
+            className="absolute inset-0 z-50 flex items-center justify-center cursor-pointer md:hidden"
+            style={{ background: 'transparent' }}
+          >
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+              <p className="text-white text-sm font-sans-modern" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>Toque para reproduzir</p>
+            </div>
+          </div>
+        )}
+        
         {/* Desktop Video */}
         <video 
           ref={desktopVideoRef}

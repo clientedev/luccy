@@ -163,39 +163,49 @@
     object-fit: cover;
     z-index: 0;
     animation: videoFadeInOut 1s ease-in-out;
+    pointer-events: none;
   }
 
-  /* Remove all video controls and play button */
-  .hero-video::-webkit-media-controls {
+  /* Aggressively remove ALL video controls and play buttons */
+  .hero-video::-webkit-media-controls,
+  .hero-video::-webkit-media-controls-enclosure,
+  .hero-video::-webkit-media-controls-panel,
+  .hero-video::-webkit-media-controls-play-button,
+  .hero-video::-webkit-media-controls-start-playback-button,
+  .hero-video::-webkit-media-controls-overlay-play-button,
+  .hero-video::-webkit-media-controls-overlay-enclosure {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
   }
 
-  .hero-video::-webkit-media-controls-enclosure {
-    display: none !important;
-  }
-
-  .hero-video::-webkit-media-controls-panel {
-    display: none !important;
-  }
-
-  .hero-video::-webkit-media-controls-play-button {
-    display: none !important;
-  }
-
-  .hero-video::-webkit-media-controls-start-playback-button {
-    display: none !important;
-  }
-
+  /* Hide play button on different browsers */
   .hero-video::--webkit-media-controls-overlay-play-button {
     display: none !important;
   }
 
-  .hero-video::-webkit-media-controls-overlay-enclosure {
-    display: none !important;
+  /* Additional overlay to cover any play button */
+  .hero-sophisticated::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: transparent;
   }
 
-  .hero-video {
-    pointer-events: none;
+  /* Force hide native video controls on mobile browsers */
+  .hero-video[poster] {
+    background: transparent;
+  }
+  
+  video.hero-video::-internal-media-controls-overlay-cast-button {
+    display: none;
+  }
+  
+  .hero-video::cue {
+    display: none;
   }
 
   @keyframes videoFadeInOut {
