@@ -206,7 +206,7 @@ Todos os sistemas foram testados e estão funcionando corretamente:
   - Botão "Agende seu Horário" com animação de pulso sutil (3% scale a cada 2.5s)
   
 - **Vídeo Hero Section Mobile** (Setembro 29, 2025): Implementada versão mobile específica
-  - Vídeo mobile posicionado em `client/public/mobile-hero-video.mp4` (24MB)
+  - Vídeo mobile posicionado em `client/public/mobile-hero-video.mp4` (32MB - atualizado)
   - Desktop e mobile agora usam vídeos diferentes com classes responsivas (`hidden md:block` / `md:hidden`)
   - Textos da hero section mobile ajustados para preto (melhor visibilidade)
   - Layout mobile otimizado com conteúdo mais próximo ao topo:
@@ -215,6 +215,7 @@ Todos os sistemas foram testados e estão funcionando corretamente:
     - `align-items: flex-start` para posicionar conteúdo no topo
   - Título mobile ("Sua melhor versão começa aqui") e subtítulo em `text-black`
   - Desktop mantém cores originais (dourado/preto)
+  - Vídeo configurado com autoPlay, loop, muted e playsInline para reprodução automática sem botão de play
   
 - **Melhorias de UI** (Setembro 29, 2025):
   - Texto "Realce sua Essência" alterado para preto na versão desktop para melhor contraste
