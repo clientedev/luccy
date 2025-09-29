@@ -1183,7 +1183,7 @@ export default function Admin() {
   }
 
   if (!isAuthenticated) {
-    return <LoginForm onLogin={() => setIsAuthenticated(true)} />;
+    return <LoginForm onLogin={checkAuthStatus} />;
   }
 
   return (
