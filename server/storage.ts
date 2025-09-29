@@ -129,6 +129,38 @@ export class DatabaseStorage implements IStorage {
         ]);
       }
 
+      // Create service hours for all services that don't have them
+      const allServices = await this.getServices();
+      for (const service of allServices) {
+        const existingHours = await this.getServiceHours(service.id);
+        if (existingHours.length === 0) {
+          console.log(`Creating service hours for ${service.name}...`);
+          
+          // Create default hours (Tuesday to Saturday, 9:00 AM to 9:00 PM)
+          const defaultHours = [
+            { dayOfWeek: 2, startTime: '09:00', endTime: '21:00' }, // Tuesday
+            { dayOfWeek: 3, startTime: '09:00', endTime: '21:00' }, // Wednesday
+            { dayOfWeek: 4, startTime: '09:00', endTime: '21:00' }, // Thursday
+            { dayOfWeek: 5, startTime: '09:00', endTime: '21:00' }, // Friday
+            { dayOfWeek: 6, startTime: '09:00', endTime: '21:00' }, // Saturday
+          ];
+          
+          for (const hours of defaultHours) {
+            try {
+              await this.createServiceHours({
+                serviceId: service.id,
+                dayOfWeek: hours.dayOfWeek,
+                startTime: hours.startTime,
+                endTime: hours.endTime,
+                isAvailable: true
+              });
+            } catch (error) {
+              console.error(`Error creating service hours for ${service.name}, day ${hours.dayOfWeek}:`, error);
+            }
+          }
+        }
+      }
+
       // Check if gallery images exist
       const existingImages = await this.getGalleryImages();
       if (existingImages.length === 0) {

@@ -192,18 +192,16 @@ export default function Agendamentos() {
       const appointmentData = {
         ...data,
         appointmentDate: appointmentDateTime,
+        appointmentTime: data.appointmentTime, // Keep appointmentTime as required by backend
         serviceId: selectedService
       };
-      
-      // Remove appointmentTime from the data sent to backend
-      const { appointmentTime, ...backendData } = appointmentData;
       
       return await fetch("/api/appointments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(backendData)
+        body: JSON.stringify(appointmentData)
       }).then(res => res.json());
     },
     onSuccess: () => {
