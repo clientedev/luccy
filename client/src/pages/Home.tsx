@@ -1,11 +1,30 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useToast } from "@/hooks/use-toast";
+import { insertTestimonialSchema } from "@shared/schema";
+import { z } from "zod";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import ServiceCard from "@/components/ServiceCard";
+import { Star, MessageCircle } from "lucide-react";
+
+const testimonialFormSchema = insertTestimonialSchema.omit({ approved: true });
+type TestimonialForm = z.infer<typeof testimonialFormSchema>;
 
 export default function Home() {
+  const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
+  const { toast } = useToast();
+
   const { data: services, isLoading: servicesLoading } = useQuery({
     queryKey: ["/api/services"],
   });
@@ -13,6 +32,40 @@ export default function Home() {
   const { data: testimonials, isLoading: testimonialsLoading } = useQuery({
     queryKey: ["/api/testimonials"],
   });
+
+  const testimonialForm = useForm<TestimonialForm>({
+    resolver: zodResolver(testimonialFormSchema),
+    defaultValues: {
+      clientName: "",
+      content: "",
+      rating: 5,
+      service: ""
+    }
+  });
+
+  const createTestimonialMutation = useMutation({
+    mutationFn: (data: TestimonialForm) => apiRequest("POST", "/api/testimonials", data),
+    onSuccess: () => {
+      toast({
+        title: "Depoimento enviado com sucesso!",
+        description: "Seu depoimento foi enviado para aprovação. Obrigada pelo feedback!",
+      });
+      testimonialForm.reset();
+      setIsTestimonialDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/testimonials"] });
+    },
+    onError: () => {
+      toast({
+        title: "Erro ao enviar depoimento",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const onSubmitTestimonial = (data: TestimonialForm) => {
+    createTestimonialMutation.mutate(data);
+  };
 
   const whatsappUrl = "https://wa.me/5511944555381?text=Olá! Gostaria de agendar um horário no Luccy Studio";
 
@@ -215,6 +268,141 @@ export default function Home() {
                 </Card>
               )) : null
             )}
+          </div>
+
+          <div className="text-center mt-12">
+            <Dialog open={isTestimonialDialogOpen} onOpenChange={setIsTestimonialDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3" data-testid="button-add-testimonial">
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  Deixar Depoimento
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Compartilhe sua Experiência</DialogTitle>
+                </DialogHeader>
+                <Form {...testimonialForm}>
+                  <form onSubmit={testimonialForm.handleSubmit(onSubmitTestimonial)} className="space-y-4">
+                    <FormField
+                      control={testimonialForm.control}
+                      name="clientName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Seu Nome</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Digite seu nome" 
+                              {...field} 
+                              data-testid="input-testimonial-name"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={testimonialForm.control}
+                      name="service"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Serviço Realizado</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} value={field.value || ""}>
+                              <SelectTrigger data-testid="select-testimonial-service">
+                                <SelectValue placeholder="Selecione o serviço" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Array.isArray(services) && services.map((service: any) => (
+                                  <SelectItem key={service.id} value={service.name}>
+                                    {service.name}
+                                  </SelectItem>
+                                ))}
+                                <SelectItem value="Geral">Experiência Geral</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={testimonialForm.control}
+                      name="rating"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Sua Avaliação</FormLabel>
+                          <FormControl>
+                            <div className="flex gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Button
+                                  key={star}
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="p-0 h-8 w-8"
+                                  onClick={() => field.onChange(star)}
+                                  data-testid={`star-rating-${star}`}
+                                >
+                                  <Star 
+                                    className={`w-6 h-6 ${
+                                      star <= (field.value || 0) 
+                                        ? 'fill-yellow-400 text-yellow-400' 
+                                        : 'text-gray-300'
+                                    }`}
+                                  />
+                                </Button>
+                              ))}
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={testimonialForm.control}
+                      name="content"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Seu Depoimento</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Conte como foi sua experiência no Luccy Studio..." 
+                              {...field} 
+                              data-testid="textarea-testimonial-content"
+                              rows={4}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="flex gap-2 pt-4">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => setIsTestimonialDialogOpen(false)}
+                        className="flex-1"
+                      >
+                        Cancelar
+                      </Button>
+                      <Button 
+                        type="submit" 
+                        disabled={createTestimonialMutation.isPending}
+                        className="flex-1"
+                        data-testid="button-submit-testimonial"
+                      >
+                        {createTestimonialMutation.isPending ? "Enviando..." : "Enviar"}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </section>

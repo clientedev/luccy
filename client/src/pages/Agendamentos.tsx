@@ -67,22 +67,38 @@ export default function Agendamentos() {
     // Clean the string and convert to lowercase
     const cleaned = durationStr.toLowerCase().replace(/\s+/g, '');
     
-    // Handle various formats: "90", "90min", "1h", "45m", "1h30m"
     let totalMinutes = 0;
     
-    // Extract hours
+    // Handle formats: "30min", "1h", "1h30m", "2h30m", "90", etc.
+    
+    // Extract hours - look for patterns like "1h", "2h"
     const hourMatch = cleaned.match(/(\d+)h/);
     if (hourMatch) {
       totalMinutes += parseInt(hourMatch[1]) * 60;
     }
     
-    // Extract minutes
-    const minMatch = cleaned.match(/(\d+)m(?!in)/); // Match 'm' but not 'min'
-    if (minMatch) {
-      totalMinutes += parseInt(minMatch[1]);
+    // Extract minutes in various formats:
+    // 1. "30min" format
+    const minFullMatch = cleaned.match(/(\d+)min/);
+    if (minFullMatch) {
+      totalMinutes += parseInt(minFullMatch[1]);
+    }
+    // 2. "1h30m" format - minutes after hours
+    else {
+      const minMatch = cleaned.match(/h(\d+)m/);
+      if (minMatch) {
+        totalMinutes += parseInt(minMatch[1]);
+      }
+      // 3. "1h30" format - digits after 'h' but no 'm'
+      else if (hourMatch) {
+        const afterHourMatch = cleaned.match(/h(\d+)(?!m)/);
+        if (afterHourMatch) {
+          totalMinutes += parseInt(afterHourMatch[1]);
+        }
+      }
     }
     
-    // Handle pure numbers or "90min" format
+    // Handle pure numbers or cases where no patterns matched
     if (totalMinutes === 0) {
       const numMatch = cleaned.match(/(\d+)/);
       if (numMatch) {

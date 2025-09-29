@@ -472,13 +472,24 @@ function ServicesManagement() {
               </div>
               <div>
                 <Label htmlFor="duration">Duração</Label>
-                <Input
-                  id="duration"
+                <Select
                   value={formData.duration}
-                  onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
-                  placeholder="Ex: 1h30min"
-                  data-testid="input-service-duration"
-                />
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, duration: value }))}
+                >
+                  <SelectTrigger data-testid="select-service-duration">
+                    <SelectValue placeholder="Selecione a duração" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="30min">30 minutos</SelectItem>
+                    <SelectItem value="1h">1 hora</SelectItem>
+                    <SelectItem value="1h30m">1 hora e 30 minutos</SelectItem>
+                    <SelectItem value="2h">2 horas</SelectItem>
+                    <SelectItem value="2h30m">2 horas e 30 minutos</SelectItem>
+                    <SelectItem value="3h">3 horas</SelectItem>
+                    <SelectItem value="4h">4 horas</SelectItem>
+                    <SelectItem value="5h">5 horas</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex items-center space-x-2">
                 <Switch
