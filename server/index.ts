@@ -2,10 +2,6 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
-import { exec } from "child_process";
-import { promisify } from "util";
-
-const execAsync = promisify(exec);
 
 const app = express();
 app.use(express.json());
@@ -42,19 +38,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Run database migrations automatically in production
-  if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
-    try {
-      log('Running database migrations...');
-      await execAsync('npm run db:push --force');
-      log('Database migrations completed successfully');
-    } catch (error) {
-      log(`Database migration error: ${error}`);
-      // Continue execution even if migration fails
-    }
-  }
-
   // Initialize database seed data
+  // Note: Database migrations should be run separately before deployment
+  // using: npm run db:push
   try {
     if (typeof (storage as any).initializeSeedData === 'function') {
       log('Initializing database seed data...');
@@ -63,6 +49,7 @@ app.use((req, res, next) => {
     }
   } catch (error) {
     log(`Error initializing seed data: ${error}`);
+    // Continue execution even if seed data fails - the app should still work
   }
 
   const server = await registerRoutes(app);
@@ -71,8 +58,12 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    log(`Error: ${err.message || err}`);
+    if (err.stack) {
+      log(err.stack);
+    }
+    
     res.status(status).json({ message });
-    throw err;
   });
 
   // importantly only setup vite in development and after
