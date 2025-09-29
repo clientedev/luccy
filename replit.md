@@ -196,7 +196,9 @@ Todos os sistemas foram testados e estão funcionando corretamente:
 - ✅ **Galeria**: Upload e gerenciamento de imagens da galeria
 
 ## Atualizações de Conteúdo (Setembro 2025)
-- **Imagem Hero Section**: Substituída a imagem principal da hero section por uma imagem profissional de unhas com brilho dourado (AdobeStock_100945510_1759184753313.jpeg)
-  - Imagem posicionada em `client/public/hero-bg.jpg`
-  - Tamanho: 7MB (otimização futura recomendada: conversão para WebP/AVIF para melhor performance)
-  - CSS mantido sem alterações, funcionando perfeitamente
+- **Vídeo Hero Section** (Setembro 29, 2025): Substituída a imagem estática da hero section por um vídeo em loop
+  - Vídeo posicionado em `client/public/hero-video.mp4` (23MB)
+  - Configurado com autoplay, loop, muted e playsInline para reprodução suave e contínua
+  - CSS atualizado para posicionar o vídeo como background com overlay semitransparente (opacity: 0.5)
+  - Vídeo cobre toda a seção hero mantendo aspect ratio com object-fit: cover
+  - Elemento de vídeo posicionado absolutamente atrás do conteúdo (z-index: 0)

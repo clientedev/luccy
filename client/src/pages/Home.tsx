@@ -73,6 +73,14 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="hero-sophisticated min-h-screen flex items-center justify-center">
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="hero-video"
+          src="/hero-video.mp4"
+        />
         <div className="hero-content container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
             {/* Headline de Impacto */}
