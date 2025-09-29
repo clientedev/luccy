@@ -189,4 +189,14 @@ Todos os sistemas foram testados e estão funcionando corretamente:
   - Marcação de serviços em destaque
 - ✅ **Produtos**: Sistema de produtos com categorização
 - ✅ **Depoimentos**: Sistema de aprovação e gerenciamento de depoimentos
+  - Depoimentos criados com `approved: false` por padrão
+  - Admin pode aprovar/desaprovar com botão toggle (ícone de olho)
+  - Apenas depoimentos aprovados aparecem na home page
+  - Funcionalidade testada e funcionando perfeitamente
 - ✅ **Galeria**: Upload e gerenciamento de imagens da galeria
+
+## Atualizações de Conteúdo (Setembro 2025)
+- **Imagem Hero Section**: Substituída a imagem principal da hero section por uma imagem profissional de unhas com brilho dourado (AdobeStock_100945510_1759184753313.jpeg)
+  - Imagem posicionada em `client/public/hero-bg.jpg`
+  - Tamanho: 7MB (otimização futura recomendada: conversão para WebP/AVIF para melhor performance)
+  - CSS mantido sem alterações, funcionando perfeitamente
