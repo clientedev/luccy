@@ -221,3 +221,4 @@ Todos os sistemas foram testados e estão funcionando corretamente:
   - Texto "Realce sua Essência" alterado para preto na versão desktop para melhor contraste
   - Animação de pulso adicionada ao botão CTA principal (`.cta-pulse`)
   - Animação para ao passar o mouse (`:hover`) para não interferir com interação do usuário
+  - **Vídeo Mobile - Remoção do Ícone de Play**: Removido o botão de play e texto "Toque para reproduzir" do vídeo mobile. Agora o vídeo reproduz automaticamente quando o usuário toca em qualquer lugar da tela, sem nenhum indicativo visual (overlay completamente invisível mantém funcionalidade de toque)
