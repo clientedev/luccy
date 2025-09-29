@@ -1,8 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { pool } from "./db";
 import bcrypt from "bcrypt";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import { insertCategorySchema, insertProductSchema, insertServiceSchema, insertTestimonialSchema, insertGalleryImageSchema, insertSiteSettingsSchema, insertAppointmentSchema, insertServiceHoursSchema } from "../shared/schema";
 import { ZodError } from "zod";
 
@@ -14,14 +16,28 @@ declare module "express-session" {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session middleware
+  // Configure PostgreSQL session store
+  const PgSession = connectPgSimple(session);
+  
+  // Session middleware with PostgreSQL store
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'luccy-studio-secret',
+    store: new PgSession({
+      pool: pool,
+      tableName: 'session',
+      createTableIfMissing: true
+    }),
+    secret: process.env.SESSION_SECRET || (function() {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('SESSION_SECRET environment variable must be set in production');
+      }
+      return 'luccy-studio-dev-secret-' + Math.random().toString(36);
+    })(),
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 1000 * 60 * 60 * 24 // 24 hours
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+      httpOnly: true
     }
   }));
 
