@@ -73,19 +73,29 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="hero-sophisticated min-h-screen flex items-center justify-center">
+        {/* Desktop Video */}
         <video 
           autoPlay 
           loop 
           muted 
           playsInline
-          className="hero-video"
+          className="hero-video hidden md:block"
           src="/hero-video.mp4"
+        />
+        {/* Mobile Video */}
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="hero-video md:hidden"
+          src="/mobile-hero-video.mp4"
         />
         <div className="hero-content container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
             {/* Headline de Impacto */}
             {/* Mobile Version */}
-            <h1 className="md:hidden font-serif-luxury text-4xl font-bold leading-tight mb-6 text-gold-bright">
+            <h1 className="md:hidden font-serif-luxury text-4xl font-bold leading-tight mb-6 text-black">
               Sua melhor versão<br />
               começa aqui
             </h1>
@@ -97,7 +107,7 @@ export default function Home() {
             </h1>
             
             {/* Subtítulo */}
-            <p className="font-sans-modern text-lg sm:text-xl lg:text-2xl mb-12 text-gold-bright/90 max-w-2xl mx-auto leading-relaxed">
+            <p className="font-sans-modern text-lg sm:text-xl lg:text-2xl mb-12 text-black md:text-gold-bright/90 max-w-2xl mx-auto leading-relaxed">
               Mais de 20 anos de excelência em técnicas exclusivas de beleza. 
               Um refúgio de sofisticação onde sua essência encontra a perfeição.
             </p>

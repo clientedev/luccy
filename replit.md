@@ -196,9 +196,27 @@ Todos os sistemas foram testados e estão funcionando corretamente:
 - ✅ **Galeria**: Upload e gerenciamento de imagens da galeria
 
 ## Atualizações de Conteúdo (Setembro 2025)
-- **Vídeo Hero Section** (Setembro 29, 2025): Substituída a imagem estática da hero section por um vídeo em loop
-  - Vídeo posicionado em `client/public/hero-video.mp4` (23MB)
+- **Vídeo Hero Section Desktop** (Setembro 29, 2025): Substituída a imagem estática da hero section por um vídeo em loop
+  - Vídeo desktop posicionado em `client/public/hero-video.mp4` (23MB)
   - Configurado com autoplay, loop, muted e playsInline para reprodução suave e contínua
   - CSS atualizado para posicionar o vídeo como background com overlay semitransparente (opacity: 0.5)
   - Vídeo cobre toda a seção hero mantendo aspect ratio com object-fit: cover
   - Elemento de vídeo posicionado absolutamente atrás do conteúdo (z-index: 0)
+  - Transição suave no loop do vídeo com animação de fade imperceptível
+  - Botão "Agende seu Horário" com animação de pulso sutil (3% scale a cada 2.5s)
+  
+- **Vídeo Hero Section Mobile** (Setembro 29, 2025): Implementada versão mobile específica
+  - Vídeo mobile posicionado em `client/public/mobile-hero-video.mp4` (24MB)
+  - Desktop e mobile agora usam vídeos diferentes com classes responsivas (`hidden md:block` / `md:hidden`)
+  - Textos da hero section mobile ajustados para preto (melhor visibilidade)
+  - Layout mobile otimizado com conteúdo mais próximo ao topo:
+    - `padding-top` reduzido de 15vh para 8vh
+    - `padding-bottom` reduzido de 10vh para 8vh
+    - `align-items: flex-start` para posicionar conteúdo no topo
+  - Título mobile ("Sua melhor versão começa aqui") e subtítulo em `text-black`
+  - Desktop mantém cores originais (dourado/preto)
+  
+- **Melhorias de UI** (Setembro 29, 2025):
+  - Texto "Realce sua Essência" alterado para preto na versão desktop para melhor contraste
+  - Animação de pulso adicionada ao botão CTA principal (`.cta-pulse`)
+  - Animação para ao passar o mouse (`:hover`) para não interferir com interação do usuário
