@@ -244,23 +244,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { dayOfWeek: 6, startTime: '09:00', endTime: '15:00' }, // Saturday
       ];
       
-      // Create service hours for the new service
-      console.log(`Creating service hours for service ID: ${newService.id}`);
+      // Create default service hours for the new service
       for (const hours of defaultHours) {
         try {
-          const createdHours = await storage.createServiceHours({
+          await storage.createServiceHours({
             serviceId: newService.id,
             dayOfWeek: hours.dayOfWeek,
             startTime: hours.startTime,
             endTime: hours.endTime,
             isAvailable: true
           });
-          console.log(`Successfully created hours for day ${hours.dayOfWeek}: ${hours.startTime}-${hours.endTime}`);
         } catch (hourError) {
           console.error(`Error creating service hours for day ${hours.dayOfWeek}:`, hourError);
         }
       }
-      console.log(`Finished creating service hours for service ID: ${newService.id}`);
       
       res.status(201).json(newService);
     } catch (error) {
