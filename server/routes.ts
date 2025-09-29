@@ -233,6 +233,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const service = insertServiceSchema.parse(req.body);
       const newService = await storage.createService(service);
+      
+      // Create default service hours for Monday to Friday (9:00 - 18:00)
+      const defaultHours = [
+        { dayOfWeek: 1, startTime: '09:00', endTime: '18:00' }, // Monday
+        { dayOfWeek: 2, startTime: '09:00', endTime: '18:00' }, // Tuesday
+        { dayOfWeek: 3, startTime: '09:00', endTime: '18:00' }, // Wednesday
+        { dayOfWeek: 4, startTime: '09:00', endTime: '18:00' }, // Thursday
+        { dayOfWeek: 5, startTime: '09:00', endTime: '18:00' }, // Friday
+        { dayOfWeek: 6, startTime: '09:00', endTime: '15:00' }, // Saturday
+      ];
+      
+      // Create service hours for the new service
+      console.log(`Creating service hours for service ID: ${newService.id}`);
+      for (const hours of defaultHours) {
+        try {
+          const createdHours = await storage.createServiceHours({
+            serviceId: newService.id,
+            dayOfWeek: hours.dayOfWeek,
+            startTime: hours.startTime,
+            endTime: hours.endTime,
+            isAvailable: true
+          });
+          console.log(`Successfully created hours for day ${hours.dayOfWeek}: ${hours.startTime}-${hours.endTime}`);
+        } catch (hourError) {
+          console.error(`Error creating service hours for day ${hours.dayOfWeek}:`, hourError);
+        }
+      }
+      console.log(`Finished creating service hours for service ID: ${newService.id}`);
+      
       res.status(201).json(newService);
     } catch (error) {
       if (error instanceof ZodError) {
