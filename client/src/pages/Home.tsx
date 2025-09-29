@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,8 @@ type TestimonialForm = z.infer<typeof testimonialFormSchema>;
 
 export default function Home() {
   const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
+  const desktopVideoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
 
   const { data: services, isLoading: servicesLoading } = useQuery({
@@ -69,45 +71,110 @@ export default function Home() {
 
   const whatsappUrl = "https://wa.me/5511944555381?text=Olá! Gostaria de agendar um horário no Luccy Studio";
 
+  // Force video autoplay on mobile (especially iOS)
+  useEffect(() => {
+    const playVideo = async () => {
+      try {
+        const videos = [mobileVideoRef.current, desktopVideoRef.current].filter(Boolean);
+        
+        for (const video of videos) {
+          if (video) {
+            video.muted = true;
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
+            
+            // Try to load and play
+            video.load();
+            
+            try {
+              await video.play();
+            } catch (playError) {
+              console.log('Initial play failed, will retry on interaction');
+            }
+          }
+        }
+      } catch (error) {
+        console.log('Video setup error:', error);
+      }
+    };
+
+    // Try to play immediately
+    playVideo();
+
+    // Also try to play on any user interaction
+    const handleInteraction = async () => {
+      const videos = [mobileVideoRef.current, desktopVideoRef.current].filter(Boolean);
+      
+      for (const video of videos) {
+        if (video && video.paused) {
+          try {
+            video.muted = true;
+            await video.play();
+          } catch (e) {
+            console.log('Play on interaction failed:', e);
+          }
+        }
+      }
+    };
+
+    // Listen for various interaction events
+    const events = ['touchstart', 'touchend', 'click', 'scroll'];
+    events.forEach(event => {
+      document.addEventListener(event, handleInteraction, { once: true, passive: true });
+    });
+
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, handleInteraction);
+      });
+    };
+  }, []);
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="hero-sophisticated min-h-screen flex items-center justify-center">
         {/* Desktop Video */}
         <video 
+          ref={desktopVideoRef}
           autoPlay 
           loop 
           muted 
           playsInline
+          preload="auto"
           className="hero-video hidden md:block"
-          src="/hero-video.mp4"
-        />
+        >
+          <source src="/hero-video.mp4" type="video/mp4" />
+        </video>
         {/* Mobile Video */}
         <video 
+          ref={mobileVideoRef}
           autoPlay 
           loop 
           muted 
           playsInline
+          preload="auto"
           className="hero-video md:hidden"
-          src="/mobile-hero-video.mp4"
-        />
+        >
+          <source src="/mobile-hero-video.mp4" type="video/mp4" />
+        </video>
         <div className="hero-content container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
             {/* Headline de Impacto */}
             {/* Mobile Version */}
-            <h1 className="md:hidden font-serif-luxury text-4xl font-bold leading-tight mb-6 text-black">
+            <h1 className="md:hidden font-serif-luxury text-4xl font-bold leading-tight mb-6 text-black" style={{ textShadow: '0 2px 10px rgba(212, 175, 55, 0.6), 0 0 20px rgba(212, 175, 55, 0.4)' }}>
               Sua melhor versão<br />
               começa aqui
             </h1>
             
             {/* Desktop Version */}
-            <h1 className="hidden md:block font-serif-luxury text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-gold-bright">
+            <h1 className="hidden md:block font-serif-luxury text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-gold-bright" style={{ textShadow: '0 2px 10px rgba(212, 175, 55, 0.6), 0 0 20px rgba(212, 175, 55, 0.4)' }}>
               Transforme sua Beleza,<br />
-              <span className="text-black">Realce sua Essência</span>
+              <span className="text-black" style={{ textShadow: '0 2px 10px rgba(212, 175, 55, 0.6), 0 0 20px rgba(212, 175, 55, 0.4)' }}>Realce sua Essência</span>
             </h1>
             
             {/* Subtítulo */}
-            <p className="font-sans-modern text-lg sm:text-xl lg:text-2xl mb-12 text-black md:text-gold-bright/90 max-w-2xl mx-auto leading-relaxed">
+            <p className="font-sans-modern text-lg sm:text-xl lg:text-2xl mb-12 text-black md:text-gold-bright/90 max-w-2xl mx-auto leading-relaxed" style={{ textShadow: '0 1px 8px rgba(212, 175, 55, 0.5), 0 0 15px rgba(212, 175, 55, 0.3)' }}>
               Mais de 20 anos de excelência em técnicas exclusivas de beleza. 
               Um refúgio de sofisticação onde sua essência encontra a perfeição.
             </p>
