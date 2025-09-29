@@ -63,6 +63,103 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  
+  // Initialize seed data if none exists
+  async initializeSeedData(): Promise<void> {
+    try {
+      // Check if categories exist
+      const existingCategories = await this.getCategories();
+      if (existingCategories.length === 0) {
+        console.log('Creating initial categories...');
+        await Promise.all([
+          this.createCategory({ name: 'Cílios', slug: 'cilios', description: 'Extensões de cílios fio a fio e volume russo' }),
+          this.createCategory({ name: 'Unhas', slug: 'unhas', description: 'Nail art, esmaltação e design exclusivo' }),
+          this.createCategory({ name: 'Cabelo', slug: 'cabelo', description: 'Corte, coloração e mega hair' }),
+          this.createCategory({ name: 'Maquiagem', slug: 'maquiagem', description: 'Maquiagem para eventos e dia a dia' })
+        ]);
+      }
+
+      // Check if services exist
+      const existingServices = await this.getServices();
+      if (existingServices.length === 0) {
+        console.log('Creating initial services...');
+        await Promise.all([
+          this.createService({ 
+            name: 'Extensão de Cílios Fio a Fio', 
+            description: 'Técnica natural que adiciona volume e comprimento aos cílios',
+            price: 'A partir de R$ 80', 
+            duration: '2h', 
+            featured: true 
+          }),
+          this.createService({ 
+            name: 'Volume Russo', 
+            description: 'Técnica que aplica múltiplos fios em cada cílio natural',
+            price: 'A partir de R$ 120', 
+            duration: '2h30', 
+            featured: true 
+          }),
+          this.createService({ 
+            name: 'Nail Art Personalizada', 
+            description: 'Design exclusivo em unhas com técnicas modernas',
+            price: 'A partir de R$ 60', 
+            duration: '1h30', 
+            featured: true 
+          }),
+          this.createService({ 
+            name: 'Mega Hair Natural', 
+            description: 'Aplicação de cabelo natural com técnicas exclusivas',
+            price: 'A partir de R$ 300', 
+            duration: '4h', 
+            featured: true 
+          }),
+          this.createService({ 
+            name: 'Maquiagem Social', 
+            description: 'Maquiagem completa para eventos especiais',
+            price: 'A partir de R$ 100', 
+            duration: '1h', 
+            featured: false 
+          })
+        ]);
+      }
+
+      // Check if gallery images exist
+      const existingImages = await this.getGalleryImages();
+      if (existingImages.length === 0) {
+        console.log('Creating initial gallery images...');
+        await Promise.all([
+          this.createGalleryImage({
+            title: 'Extensão de Cílios Volume Russo',
+            imageUrl: 'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=400',
+            category: 'cilios',
+            featured: true
+          }),
+          this.createGalleryImage({
+            title: 'Nail Art Dourada',
+            imageUrl: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400',
+            category: 'unhas',
+            featured: true
+          }),
+          this.createGalleryImage({
+            title: 'Cabelo com Luzes',
+            imageUrl: 'https://images.unsplash.com/photo-1560264280-88b68371db39?w=400',
+            category: 'cabelo',
+            featured: true
+          }),
+          this.createGalleryImage({
+            title: 'Maquiagem para Noiva',
+            imageUrl: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400',
+            category: 'maquiagem',
+            featured: true
+          })
+        ]);
+      }
+
+      console.log('Database seed initialization completed');
+    } catch (error) {
+      console.error('Error initializing seed data:', error);
+      throw error;
+    }
+  }
   // Users
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -695,4 +792,4 @@ export class MemoryStorage implements IStorage {
 }
 
 // Use in-memory storage for development (since no database is provisioned)
-export const storage = new MemoryStorage();
+export const storage = new DatabaseStorage();

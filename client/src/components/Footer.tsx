@@ -31,6 +31,7 @@ const socialLinks = [
 export default function Footer() {
   const [, setLocation] = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -50,7 +51,7 @@ export default function Footer() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
@@ -59,6 +60,7 @@ export default function Footer() {
           description: "Redirecionando para o painel administrativo...",
         });
         setIsModalOpen(false);
+        setUsername("");
         setPassword("");
         setLocation("/admin");
       } else {
@@ -76,12 +78,14 @@ export default function Footer() {
       });
     } finally {
       setIsLoading(false);
+      setUsername("");
       setPassword("");
     }
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setUsername("");
     setPassword("");
   };
 
@@ -189,6 +193,20 @@ export default function Footer() {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="admin-username">Usuário</Label>
+              <Input
+                id="admin-username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Digite o usuário"
+                required
+                disabled={isLoading}
+                data-testid="input-footer-admin-username"
+                className="mt-1"
+              />
+            </div>
             <div>
               <Label htmlFor="admin-password">Senha de Acesso</Label>
               <Input

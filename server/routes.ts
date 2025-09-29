@@ -39,11 +39,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { username, password } = req.body;
       
-      // Default admin credentials
-      const adminUsername = process.env.ADMIN_USERNAME || 'luccy.admin';
-      const adminPassword = process.env.ADMIN_PASSWORD || '4731v8';
+      // Admin credentials from environment variables
+      const adminUsername = process.env.ADMIN_USERNAME;
+      const adminPassword = process.env.ADMIN_PASSWORD;
       
-      if (username === adminUsername && password === adminPassword) {
+      // In production, require environment variables to be set
+      if (process.env.NODE_ENV === 'production' && (!adminUsername || !adminPassword)) {
+        return res.status(500).json({ 
+          message: 'Configuração de segurança incompleta. Entre em contato com o administrador.' 
+        });
+      }
+      
+      // Fallback for development only
+      const finalUsername = adminUsername || 'luccy';
+      const finalPassword = adminPassword || 'luccy4731';
+      
+      if (username === finalUsername && password === finalPassword) {
         req.session.isAdmin = true;
         res.json({ success: true });
       } else {
