@@ -71,58 +71,72 @@ export default function Home() {
 
   const whatsappUrl = "https://wa.me/5511944555381?text=Olá! Gostaria de agendar um horário no Luccy Studio";
 
-  // Force video autoplay on mobile (especially iOS)
+  // Force video autoplay on mobile (especially iOS) - aggressive approach
   useEffect(() => {
-    const playVideo = async () => {
+    const attemptAutoplay = async (video: HTMLVideoElement) => {
+      if (!video) return;
+      
       try {
-        const videos = [mobileVideoRef.current, desktopVideoRef.current].filter(Boolean);
+        // Ensure muted and inline playback
+        video.muted = true;
+        video.defaultMuted = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.setAttribute('x5-playsinline', 'true');
         
-        for (const video of videos) {
-          if (video) {
-            video.muted = true;
-            video.setAttribute('playsinline', '');
-            video.setAttribute('webkit-playsinline', '');
-            
-            // Try to load and play
-            video.load();
-            
-            try {
-              await video.play();
-            } catch (playError) {
-              console.log('Initial play failed, will retry on interaction');
-            }
-          }
+        // Load the video
+        video.load();
+        
+        // Wait a bit for the video to be ready
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Try to play
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          await playPromise;
         }
       } catch (error) {
-        console.log('Video setup error:', error);
+        // Silently fail - will retry on interaction
       }
     };
 
-    // Try to play immediately
-    playVideo();
+    const playAllVideos = async () => {
+      const videos = [mobileVideoRef.current, desktopVideoRef.current].filter((v): v is HTMLVideoElement => v !== null);
+      for (const video of videos) {
+        await attemptAutoplay(video);
+      }
+    };
 
-    // Also try to play on any user interaction
-    const handleInteraction = async () => {
+    // Try multiple times with increasing delays
+    playAllVideos();
+    setTimeout(playAllVideos, 500);
+    setTimeout(playAllVideos, 1000);
+
+    // Handle any user interaction
+    const handleInteraction = () => {
       const videos = [mobileVideoRef.current, desktopVideoRef.current].filter(Boolean);
       
-      for (const video of videos) {
+      videos.forEach(async (video) => {
         if (video && video.paused) {
           try {
             video.muted = true;
             await video.play();
           } catch (e) {
-            console.log('Play on interaction failed:', e);
+            // Ignore
           }
         }
-      }
+      });
     };
 
-    // Listen for various interaction events
-    const events = ['touchstart', 'touchend', 'click', 'scroll'];
+    // Listen for user interaction
+    const events = ['touchstart', 'touchend', 'click', 'scroll', 'mousemove'];
+    const eventOptions = { once: true, passive: true, capture: true };
+    
     events.forEach(event => {
-      document.addEventListener(event, handleInteraction, { once: true, passive: true });
+      document.addEventListener(event, handleInteraction, eventOptions);
     });
 
+    // Cleanup
     return () => {
       events.forEach(event => {
         document.removeEventListener(event, handleInteraction);
@@ -142,6 +156,9 @@ export default function Home() {
           muted 
           playsInline
           preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+          x-webkit-airplay="deny"
           className="hero-video hidden md:block"
         >
           <source src="/hero-video.mp4" type="video/mp4" />
@@ -154,6 +171,9 @@ export default function Home() {
           muted 
           playsInline
           preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+          x-webkit-airplay="deny"
           className="hero-video md:hidden"
         >
           <source src="/mobile-hero-video.mp4" type="video/mp4" />
