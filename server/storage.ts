@@ -1,9 +1,10 @@
 import { 
-  users, categories, products, services, testimonials, galleryImages, siteSettings, appointments,
+  users, categories, products, services, testimonials, galleryImages, siteSettings, appointments, serviceHours,
   type User, type InsertUser, type Category, type InsertCategory, 
   type Product, type InsertProduct, type Service, type InsertService,
   type Testimonial, type InsertTestimonial, type GalleryImage, type InsertGalleryImage,
-  type SiteSettings, type InsertSiteSettings, type Appointment, type InsertAppointment
+  type SiteSettings, type InsertSiteSettings, type Appointment, type InsertAppointment,
+  type ServiceHours, type InsertServiceHours
 } from "../shared/schema";
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
@@ -51,6 +52,12 @@ export interface IStorage {
   getSiteSetting(key: string): Promise<SiteSettings | undefined>;
   setSiteSetting(setting: InsertSiteSettings): Promise<SiteSettings>;
   getAllSiteSettings(): Promise<SiteSettings[]>;
+
+  // Service Hours
+  getServiceHours(serviceId: string): Promise<ServiceHours[]>;
+  createServiceHours(serviceHours: InsertServiceHours): Promise<ServiceHours>;
+  updateServiceHours(id: string, serviceHours: Partial<InsertServiceHours>): Promise<ServiceHours | undefined>;
+  deleteServiceHours(id: string): Promise<boolean>;
 
   // Appointments
   getAppointments(): Promise<Appointment[]>;
@@ -403,6 +410,35 @@ export class DatabaseStorage implements IStorage {
     return (result.rowCount ?? 0) > 0;
   }
 
+  // Service Hours methods
+  async getServiceHours(serviceId: string): Promise<ServiceHours[]> {
+    return await db.select().from(serviceHours)
+      .where(eq(serviceHours.serviceId, serviceId))
+      .orderBy(serviceHours.dayOfWeek, serviceHours.startTime);
+  }
+
+  async createServiceHours(insertServiceHours: InsertServiceHours): Promise<ServiceHours> {
+    const [newServiceHours] = await db
+      .insert(serviceHours)
+      .values(insertServiceHours)
+      .returning();
+    return newServiceHours;
+  }
+
+  async updateServiceHours(id: string, updates: Partial<InsertServiceHours>): Promise<ServiceHours | undefined> {
+    const [updated] = await db
+      .update(serviceHours)
+      .set(updates)
+      .where(eq(serviceHours.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteServiceHours(id: string): Promise<boolean> {
+    const result = await db.delete(serviceHours).where(eq(serviceHours.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
   async getAppointmentsWithService(): Promise<(Appointment & { service: Service })[]> {
     const result = await db
       .select({
@@ -411,6 +447,7 @@ export class DatabaseStorage implements IStorage {
         clientPhone: appointments.clientPhone,
         serviceId: appointments.serviceId,
         appointmentDate: appointments.appointmentDate,
+        appointmentTime: appointments.appointmentTime,
         status: appointments.status,
         notes: appointments.notes,
         createdAt: appointments.createdAt,
@@ -436,6 +473,7 @@ export class MemoryStorage implements IStorage {
   private testimonials: Map<string, Testimonial> = new Map();
   private galleryImages: Map<string, GalleryImage> = new Map();
   private siteSettings: Map<string, SiteSettings> = new Map();
+  private serviceHours: Map<string, ServiceHours> = new Map();
   private appointments: Map<string, Appointment> = new Map();
 
   constructor() {
@@ -757,6 +795,7 @@ export class MemoryStorage implements IStorage {
       clientPhone: appointment.clientPhone,
       serviceId: appointment.serviceId,
       appointmentDate: appointment.appointmentDate,
+      appointmentTime: appointment.appointmentTime,
       status: appointment.status ?? null,
       notes: appointment.notes ?? null,
       createdAt: new Date()
@@ -788,6 +827,43 @@ export class MemoryStorage implements IStorage {
       };
     }).filter(apt => apt.service) // Only include appointments with valid services
       .sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime());
+  }
+
+  // Service Hours methods
+  async getServiceHours(serviceId: string): Promise<ServiceHours[]> {
+    const hoursArray = Array.from(this.serviceHours.values());
+    return hoursArray.filter(hours => hours.serviceId === serviceId)
+      .sort((a, b) => a.dayOfWeek - b.dayOfWeek || a.startTime.localeCompare(b.startTime));
+  }
+
+  async createServiceHours(serviceHours: InsertServiceHours): Promise<ServiceHours> {
+    const newServiceHours: ServiceHours = {
+      id: this.generateId(),
+      serviceId: serviceHours.serviceId,
+      dayOfWeek: serviceHours.dayOfWeek,
+      startTime: serviceHours.startTime,
+      endTime: serviceHours.endTime,
+      isAvailable: serviceHours.isAvailable ?? true,
+      createdAt: new Date()
+    };
+    this.serviceHours.set(newServiceHours.id, newServiceHours);
+    return newServiceHours;
+  }
+
+  async updateServiceHours(id: string, updates: Partial<InsertServiceHours>): Promise<ServiceHours | undefined> {
+    const existing = this.serviceHours.get(id);
+    if (!existing) return undefined;
+
+    const updated: ServiceHours = {
+      ...existing,
+      ...updates
+    };
+    this.serviceHours.set(id, updated);
+    return updated;
+  }
+
+  async deleteServiceHours(id: string): Promise<boolean> {
+    return this.serviceHours.delete(id);
   }
 }
 

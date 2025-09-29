@@ -1,10 +1,4 @@
-import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 
 const quickLinks = [
   { name: "Início", href: "/" },
@@ -30,63 +24,9 @@ const socialLinks = [
 
 export default function Footer() {
   const [, setLocation] = useLocation();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
 
   const handleAdminAccess = () => {
-    setIsModalOpen(true);
-  };
-
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      // Authenticate with backend only
-      const response = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Acesso autorizado!",
-          description: "Redirecionando para o painel administrativo...",
-        });
-        setIsModalOpen(false);
-        setUsername("");
-        setPassword("");
-        setLocation("/admin");
-      } else {
-        toast({
-          title: "Senha incorreta",
-          description: "Tente novamente.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Erro de acesso",
-        description: "Não foi possível acessar o painel administrativo.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-      setUsername("");
-      setPassword("");
-    }
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setUsername("");
-    setPassword("");
+    setLocation("/admin");
   };
 
   return (
@@ -182,68 +122,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
-      {/* Admin Access Modal */}
-      <Dialog open={isModalOpen} onOpenChange={closeModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <i className="fas fa-lock text-primary"></i>
-              Acesso Administrativo
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="admin-username">Usuário</Label>
-              <Input
-                id="admin-username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Digite o usuário"
-                required
-                disabled={isLoading}
-                data-testid="input-footer-admin-username"
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="admin-password">Senha de Acesso</Label>
-              <Input
-                id="admin-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Digite a senha"
-                required
-                disabled={isLoading}
-                data-testid="input-footer-admin-password"
-                className="mt-1"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={closeModal}
-                className="flex-1"
-                disabled={isLoading}
-                data-testid="button-cancel-admin-access"
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1"
-                disabled={isLoading}
-                data-testid="button-confirm-admin-access"
-              >
-                {isLoading ? "Verificando..." : "Acessar"}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
     </footer>
   );
 }

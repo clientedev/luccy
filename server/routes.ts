@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcrypt";
 import session from "express-session";
-import { insertCategorySchema, insertProductSchema, insertServiceSchema, insertTestimonialSchema, insertGalleryImageSchema, insertSiteSettingsSchema, insertAppointmentSchema } from "../shared/schema";
+import { insertCategorySchema, insertProductSchema, insertServiceSchema, insertTestimonialSchema, insertGalleryImageSchema, insertSiteSettingsSchema, insertAppointmentSchema, insertServiceHoursSchema } from "../shared/schema";
 import { ZodError } from "zod";
 
 declare module "express-session" {
@@ -414,6 +414,144 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Service Hours
+  app.get('/api/service-hours/:serviceId', async (req, res) => {
+    try {
+      const { serviceId } = req.params;
+      const serviceHours = await storage.getServiceHours(serviceId);
+      res.json(serviceHours);
+    } catch (error) {
+      res.status(500).json({ message: 'Erro ao carregar horários do serviço' });
+    }
+  });
+
+  app.post('/api/service-hours', requireAdmin, async (req, res) => {
+    try {
+      const serviceHours = insertServiceHoursSchema.parse(req.body);
+      const newServiceHours = await storage.createServiceHours(serviceHours);
+      res.status(201).json(newServiceHours);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ message: 'Dados inválidos', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Erro ao criar horário' });
+      }
+    }
+  });
+
+  app.put('/api/service-hours/:id', requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = insertServiceHoursSchema.partial().parse(req.body);
+      const updated = await storage.updateServiceHours(id, updates);
+      if (updated) {
+        res.json(updated);
+      } else {
+        res.status(404).json({ message: 'Horário não encontrado' });
+      }
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ message: 'Dados inválidos', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Erro ao atualizar horário' });
+      }
+    }
+  });
+
+  app.delete('/api/service-hours/:id', requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deleteServiceHours(id);
+      if (deleted) {
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ message: 'Horário não encontrado' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Erro ao deletar horário' });
+    }
+  });
+
+  // Available time slots
+  app.get('/api/services/:serviceId/slots', async (req, res) => {
+    try {
+      const { serviceId } = req.params;
+      const { date } = req.query;
+      
+      if (!date || typeof date !== 'string') {
+        return res.status(400).json({ message: 'Data é obrigatória (formato: YYYY-MM-DD)' });
+      }
+      
+      // Get service hours for the day of week
+      const serviceHours = await storage.getServiceHours(serviceId);
+      const requestedDate = new Date(date + 'T00:00:00');
+      const dayOfWeek = requestedDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      
+      const dayHours = serviceHours.filter(h => h.dayOfWeek === dayOfWeek && h.isAvailable);
+      
+      if (dayHours.length === 0) {
+        return res.json([]); // No hours available for this day
+      }
+      
+      // Get existing appointments for this date and service (exclude cancelled ones)
+      const appointments = await storage.getAppointmentsByDate(date);
+      const bookedTimes = appointments
+        .filter(apt => apt.status !== 'cancelled' && apt.serviceId === serviceId)
+        .map(apt => apt.appointmentTime);
+      
+      // Check if this is today to exclude past times
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const isToday = date === today;
+      const currentMinutes = isToday ? now.getHours() * 60 + now.getMinutes() : 0;
+      
+      // Generate 30-minute slots
+      const availableSlots: string[] = [];
+      
+      for (const hours of dayHours) {
+        const startTime = hours.startTime;
+        const endTime = hours.endTime;
+        
+        let current = timeToMinutes(startTime);
+        const end = timeToMinutes(endTime);
+        
+        // Ensure we start at a 30-minute boundary
+        current = Math.ceil(current / 30) * 30;
+        
+        while (current < end) {
+          const timeSlot = minutesToTime(current);
+          
+          // Skip past times if this is today
+          if (isToday && current <= currentMinutes + 30) { // Add 30min buffer for booking
+            current += 30;
+            continue;
+          }
+          
+          if (!bookedTimes.includes(timeSlot)) {
+            availableSlots.push(timeSlot);
+          }
+          current += 30; // 30-minute increments
+        }
+      }
+      
+      res.json(availableSlots.sort());
+    } catch (error) {
+      res.status(500).json({ message: 'Erro ao carregar horários disponíveis' });
+    }
+  });
+
+  // Helper functions
+  function timeToMinutes(time: string): number {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  }
+  
+  function minutesToTime(minutes: number): string {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+  }
+
   // Appointments
   app.get('/api/appointments', async (req, res) => {
     try {
@@ -453,8 +591,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
         requestBody.appointmentDate = parsedDate;
       }
       
+      // Validate appointmentTime format and 30-minute increments
+      if (requestBody.appointmentTime) {
+        const timeRegex = /^([01]?\d|2[0-3]):([0-5]\d)$/;
+        if (!timeRegex.test(requestBody.appointmentTime)) {
+          return res.status(400).json({ 
+            message: 'Formato de horário inválido. Use HH:MM (ex: 09:00, 14:30)' 
+          });
+        }
+        
+        const minutes = timeToMinutes(requestBody.appointmentTime);
+        if (minutes % 30 !== 0) {
+          return res.status(400).json({ 
+            message: 'Horário deve ser em intervalos de 30 minutos (ex: 09:00, 09:30, 10:00)' 
+          });
+        }
+      }
+      
       // Validate with Zod schema
       const appointment = insertAppointmentSchema.parse(requestBody);
+      
+      // Check if the time slot is available
+      if (appointment.appointmentTime && appointment.serviceId) {
+        const dateStr = appointment.appointmentDate.toISOString().split('T')[0];
+        const serviceHours = await storage.getServiceHours(appointment.serviceId);
+        const dayOfWeek = appointment.appointmentDate.getDay();
+        
+        const dayHours = serviceHours.filter(h => h.dayOfWeek === dayOfWeek && h.isAvailable);
+        
+        let timeIsInRange = false;
+        for (const hours of dayHours) {
+          const startMinutes = timeToMinutes(hours.startTime);
+          const endMinutes = timeToMinutes(hours.endTime);
+          const appointmentMinutes = timeToMinutes(appointment.appointmentTime);
+          
+          if (appointmentMinutes >= startMinutes && appointmentMinutes < endMinutes) {
+            timeIsInRange = true;
+            break;
+          }
+        }
+        
+        if (!timeIsInRange) {
+          return res.status(400).json({ 
+            message: 'Horário não disponível para este serviço neste dia' 
+          });
+        }
+        
+        // Check if time slot is already booked for the same service
+        const existingAppointments = await storage.getAppointmentsByDate(dateStr);
+        const timeConflict = existingAppointments.some(apt => 
+          apt.appointmentTime === appointment.appointmentTime &&
+          apt.serviceId === appointment.serviceId &&
+          apt.status !== 'cancelled' // Ignore cancelled appointments
+        );
+        
+        if (timeConflict) {
+          return res.status(400).json({ 
+            message: 'Este horário já está ocupado. Escolha outro horário.' 
+          });
+        }
+      }
+      
       const newAppointment = await storage.createAppointment(appointment);
       res.status(201).json(newAppointment);
     } catch (error) {

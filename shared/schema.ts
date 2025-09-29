@@ -65,12 +65,23 @@ export const siteSettings = pgTable("site_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const serviceHours = pgTable("service_hours", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  serviceId: varchar("service_id").references(() => services.id).notNull(),
+  dayOfWeek: integer("day_of_week").notNull(), // 0=Sunday, 1=Monday, etc.
+  startTime: text("start_time").notNull(), // Format: "HH:MM"
+  endTime: text("end_time").notNull(), // Format: "HH:MM"  
+  isAvailable: boolean("is_available").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const appointments = pgTable("appointments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   clientName: text("client_name").notNull(),
   clientPhone: text("client_phone").notNull(),
   serviceId: varchar("service_id").references(() => services.id).notNull(),
   appointmentDate: timestamp("appointment_date").notNull(),
+  appointmentTime: text("appointment_time").notNull(), // Format: "HH:MM"
   status: text("status").default("pending"), // pending, confirmed, completed, cancelled
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -90,6 +101,14 @@ export const categoriesRelations = relations(categories, ({ many }) => ({
 
 export const servicesRelations = relations(services, ({ many }) => ({
   appointments: many(appointments),
+  serviceHours: many(serviceHours),
+}));
+
+export const serviceHoursRelations = relations(serviceHours, ({ one }) => ({
+  service: one(services, {
+    fields: [serviceHours.serviceId],
+    references: [services.id],
+  }),
 }));
 
 export const appointmentsRelations = relations(appointments, ({ one }) => ({
@@ -134,6 +153,11 @@ export const insertSiteSettingsSchema = createInsertSchema(siteSettings).omit({
   updatedAt: true,
 });
 
+export const insertServiceHoursSchema = createInsertSchema(serviceHours).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertAppointmentSchema = createInsertSchema(appointments).omit({
   id: true,
   createdAt: true,
@@ -160,6 +184,9 @@ export type InsertGalleryImage = z.infer<typeof insertGalleryImageSchema>;
 
 export type SiteSettings = typeof siteSettings.$inferSelect;
 export type InsertSiteSettings = z.infer<typeof insertSiteSettingsSchema>;
+
+export type ServiceHours = typeof serviceHours.$inferSelect;
+export type InsertServiceHours = z.infer<typeof insertServiceHoursSchema>;
 
 export type Appointment = typeof appointments.$inferSelect;
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
