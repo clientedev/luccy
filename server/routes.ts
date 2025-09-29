@@ -16,6 +16,11 @@ declare module "express-session" {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Trust proxy for Railway deployment
+  if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+  }
+  
   // Configure PostgreSQL session store
   const PgSession = connectPgSimple(session);
   
@@ -28,16 +33,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }),
     secret: process.env.SESSION_SECRET || (function() {
       if (process.env.NODE_ENV === 'production') {
-        throw new Error('SESSION_SECRET environment variable must be set in production');
+        console.warn('⚠️  SESSION_SECRET not set, using fallback. Set SESSION_SECRET in production!');
+        return 'luccy-studio-prod-fallback-' + Math.random().toString(36);
       }
       return 'luccy-studio-dev-secret-' + Math.random().toString(36);
     })(),
     resave: false,
     saveUninitialized: false,
+    proxy: process.env.NODE_ENV === 'production',
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
-      httpOnly: true
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     }
   }));
 
