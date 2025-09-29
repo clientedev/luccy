@@ -71,3 +71,71 @@ Preferred communication style: Simple, everyday language.
 - **Password Security**: bcrypt for secure password hashing
 - **Database Connection**: WebSocket support via ws package for Neon serverless
 - **Development Security**: Runtime error overlay and development banner for debugging
+
+# Recent Changes (September 2025)
+
+## Database Improvements
+- **Automated Database Setup**: Criado arquivo `server/migrate.ts` com funções automáticas para:
+  - Verificar e habilitar extensões PostgreSQL necessárias (pgcrypto, uuid-ossp)
+  - Validar integridade de foreign keys
+  - Criar índices para otimizar performance de queries
+  - Diagnosticar problemas do banco de dados
+  - Limpar dados órfãos
+  
+- **Diagnóstico Automático**: Sistema agora executa diagnóstico completo do banco na inicialização em modo desenvolvimento, mostrando:
+  - Contagem de registros em cada tabela
+  - Serviços sem horários definidos
+  - Status dos agendamentos
+  - Status dos depoimentos (aprovados vs pendentes)
+
+## Bug Fixes - Admin Panel
+### Problema 1: Queries com Query Parameters
+- **Problema**: Agendamentos e depoimentos não apareciam no painel admin
+- **Causa**: TanStack Query v5 default queryFn usa `queryKey.join("/")` que não suporta objetos como query parameters
+- **Solução**: Implementadas queryFn customizadas para rotas com parâmetros:
+  ```typescript
+  // Antes (quebrava):
+  queryKey: ["/api/testimonials", { admin: "true" }]
+  
+  // Depois (funciona):
+  queryKey: ["/api/testimonials", "admin"],
+  queryFn: async () => {
+    const res = await fetch("/api/testimonials?admin=true", {
+      credentials: "include"
+    });
+    return res.json();
+  }
+  ```
+
+### Problema 2: Tratamento de Erros nas Mutations
+- **Problema**: Erros ao salvar serviços não mostravam mensagem específica
+- **Solução**: 
+  - Adicionado tratamento de erro detalhado em todas as mutations (services, appointments, testimonials)
+  - Mensagens de erro agora mostram descrição específica do problema
+  - Console.error adicionado para debug durante desenvolvimento
+  
+### Problema 3: Mutations não Usavam apiRequest Corretamente
+- **Problema**: Algumas mutations usavam fetch() direto em vez de apiRequest()
+- **Solução**: Padronizadas todas as mutations para usar apiRequest com credenciais
+  ```typescript
+  // Agora todas as mutations seguem o padrão:
+  mutationFn: async (data) => {
+    const res = await apiRequest("POST", "/api/endpoint", data);
+    return res.json();
+  }
+  ```
+
+## Melhorias de Infraestrutura
+- **Índices de Performance**: Criados índices automáticos para:
+  - appointments(appointment_date, service_id, status)
+  - service_hours(service_id, day_of_week)
+  - products(category_id)
+  - testimonials(approved)
+  - gallery_images(featured)
+
+- **Validação Automática**: Sistema verifica valores NULL em colunas obrigatórias na inicialização
+
+## Deployment Configuration
+- Configurado para deploy no Railway com PostgreSQL
+- Workflow otimizado para desenvolvimento com diagnóstico automático
+- Sistema de migração automática garante banco sempre configurado corretamente
