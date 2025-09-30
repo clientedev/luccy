@@ -1528,12 +1528,12 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="appointments" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-            <TabsTrigger value="appointments" data-testid="tab-appointments" className="text-xs sm:text-sm">Agendamentos</TabsTrigger>
-            <TabsTrigger value="services" data-testid="tab-services" className="text-xs sm:text-sm">Serviços</TabsTrigger>
-            <TabsTrigger value="products" data-testid="tab-products" className="text-xs sm:text-sm">Produtos</TabsTrigger>
-            <TabsTrigger value="testimonials" data-testid="tab-testimonials" className="text-xs sm:text-sm">Depoimentos</TabsTrigger>
-            <TabsTrigger value="gallery" data-testid="tab-gallery" className="text-xs sm:text-sm">Galeria</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 sm:gap-2 h-auto p-1 sm:p-1.5">
+            <TabsTrigger value="appointments" data-testid="tab-appointments" className="text-xs sm:text-sm py-2 sm:py-2.5">Agendamentos</TabsTrigger>
+            <TabsTrigger value="services" data-testid="tab-services" className="text-xs sm:text-sm py-2 sm:py-2.5">Serviços</TabsTrigger>
+            <TabsTrigger value="products" data-testid="tab-products" className="text-xs sm:text-sm py-2 sm:py-2.5">Produtos</TabsTrigger>
+            <TabsTrigger value="testimonials" data-testid="tab-testimonials" className="text-xs sm:text-sm py-2 sm:py-2.5">Depoimentos</TabsTrigger>
+            <TabsTrigger value="gallery" data-testid="tab-gallery" className="text-xs sm:text-sm py-2 sm:py-2.5">Galeria</TabsTrigger>
           </TabsList>
 
           <TabsContent value="appointments">
