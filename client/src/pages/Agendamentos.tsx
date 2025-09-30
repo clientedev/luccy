@@ -251,7 +251,7 @@ export default function Agendamentos() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Calendar and Service Selection */}
           <Card>
             <CardHeader>
@@ -283,20 +283,22 @@ export default function Agendamentos() {
               {/* Calendar */}
               <div>
                 <label className="text-sm font-medium mb-2 block">Escolha a Data</label>
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  disabled={(date) => 
-                    isBefore(startOfDay(date), startOfDay(new Date())) ||
-                    date.getDay() === 0 || // Sunday
-                    date.getDay() === 1    // Monday
-                  }
-                  locale={ptBR}
-                  className="rounded-md border"
-                  data-testid="calendar-appointment"
-                />
-                <p className="text-xs text-muted-foreground mt-2">
+                <div className="flex justify-center">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    disabled={(date) => 
+                      isBefore(startOfDay(date), startOfDay(new Date())) ||
+                      date.getDay() === 0 || // Sunday
+                      date.getDay() === 1    // Monday
+                    }
+                    locale={ptBR}
+                    className="rounded-md border"
+                    data-testid="calendar-appointment"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
                   Funcionamos de terça a sábado, das 9h às 21h
                 </p>
               </div>
@@ -307,7 +309,7 @@ export default function Agendamentos() {
                   <label className="text-sm font-medium mb-2 block">
                     Horários Disponíveis - {format(selectedDate, "dd/MM/yyyy", { locale: ptBR })}
                   </label>
-                  <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto">
                     {availableSlots.length > 0 ? (
                       availableSlots.map((slot) => (
                         <Button
@@ -316,12 +318,13 @@ export default function Agendamentos() {
                           size="sm"
                           onClick={() => form.setValue("appointmentTime", slot.time)}
                           data-testid={`time-slot-${slot.time}`}
+                          className="text-sm"
                         >
                           {slot.time}
                         </Button>
                       ))
                     ) : (
-                      <p className="col-span-3 text-center text-muted-foreground py-4">
+                      <p className="col-span-2 sm:col-span-3 text-center text-muted-foreground py-4">
                         Nenhum horário disponível para esta data
                       </p>
                     )}

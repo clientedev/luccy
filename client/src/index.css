@@ -316,4 +316,44 @@
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
   }
+
+  /* Mobile Calendar Improvements */
+  @media (max-width: 640px) {
+    .rdp {
+      font-size: 14px;
+    }
+    
+    .rdp-months {
+      justify-content: center;
+    }
+    
+    .rdp-month {
+      width: 100%;
+      max-width: 320px;
+    }
+    
+    .rdp-cell {
+      height: 36px !important;
+      width: 36px !important;
+    }
+    
+    .rdp-day {
+      height: 36px !important;
+      width: 36px !important;
+      font-size: 13px;
+    }
+    
+    .rdp-head_cell {
+      width: 36px !important;
+      font-size: 12px;
+    }
+  }
+  
+  /* Ensure dialogs are mobile-friendly */
+  @media (max-width: 640px) {
+    [role="dialog"] {
+      max-width: calc(100vw - 2rem) !important;
+      margin: 1rem;
+    }
+  }
 }
