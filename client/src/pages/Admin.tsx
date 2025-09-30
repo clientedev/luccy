@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,8 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
-import { Trash2, Edit, Plus, Eye, EyeOff, LogOut } from "lucide-react";
+import { Trash2, Edit, Plus, Eye, EyeOff, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO, startOfDay } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface LoginFormProps {
   onLogin: () => void;
@@ -229,111 +231,431 @@ function AppointmentsManagement() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Gerenciar Agendamentos</span>
-          <Badge variant="secondary" data-testid="appointments-count">
-            {Array.isArray(appointments) ? appointments.length : 0} agendamentos
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {!Array.isArray(appointments) || appointments.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <i className="fas fa-calendar-times text-4xl mb-4 block"></i>
-            <p>Nenhum agendamento encontrado</p>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Gerenciar Agendamentos</span>
+            <Badge variant="secondary" data-testid="appointments-count">
+              {Array.isArray(appointments) ? appointments.length : 0} agendamentos
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!Array.isArray(appointments) || appointments.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <i className="fas fa-calendar-times text-4xl mb-4 block"></i>
+              <p>Nenhum agendamento encontrado</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {appointments.map((appointment: any) => (
+                <Card key={appointment.id} className="border-l-4 border-l-primary">
+                  <CardContent className="pt-4">
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div>
+                        <h4 className="font-semibold text-foreground">{appointment.clientName}</h4>
+                        <p className="text-sm text-muted-foreground">{appointment.clientPhone}</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          <i className="fas fa-calendar mr-1"></i>
+                          {formatDate(appointment.appointmentDate)}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <p className="font-medium">{appointment.service?.name || 'Serviço não encontrado'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {appointment.service?.duration && `Duração: ${appointment.service.duration}`}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {appointment.service?.price && `Preço: ${appointment.service.price}`}
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            variant={getStatusBadge(appointment.status).variant}
+                            data-testid={`status-${appointment.id}`}
+                          >
+                            {getStatusBadge(appointment.status).label}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2">
+                          <Select
+                            value={appointment.status}
+                            onValueChange={(newStatus) => handleStatusChange(appointment.id, newStatus)}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">Pendente</SelectItem>
+                              <SelectItem value="confirmed">Confirmar</SelectItem>
+                              <SelectItem value="completed">Concluir</SelectItem>
+                              <SelectItem value="cancelled">Cancelar</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openWhatsApp(appointment)}
+                            className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
+                            data-testid={`whatsapp-appointment-${appointment.id}`}
+                          >
+                            <SiWhatsapp className="w-4 h-4 mr-1" />
+                            WhatsApp
+                          </Button>
+                          
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              if (confirm('Tem certeza que deseja excluir este agendamento?')) {
+                                deleteAppointmentMutation.mutate(appointment.id);
+                              }
+                            }}
+                            data-testid={`delete-appointment-${appointment.id}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        
+                        {appointment.notes && (
+                          <div className="text-sm">
+                            <strong>Observações:</strong> {appointment.notes}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Agenda Visual */}
+      <AdminScheduleView 
+        appointments={Array.isArray(appointments) ? appointments : []} 
+        services={Array.isArray(services) ? services : []}
+        onStatusChange={handleStatusChange}
+        onWhatsAppClick={openWhatsApp}
+        onDelete={(id) => deleteAppointmentMutation.mutate(id)}
+        getStatusBadge={getStatusBadge}
+        formatDate={formatDate}
+      />
+    </>
+  );
+}
+
+function AdminScheduleView({ 
+  appointments, 
+  services,
+  onStatusChange,
+  onWhatsAppClick,
+  onDelete,
+  getStatusBadge,
+  formatDate
+}: {
+  appointments: any[];
+  services: any[];
+  onStatusChange: (id: string, status: string) => void;
+  onWhatsAppClick: (appointment: any) => void;
+  onDelete: (id: string) => void;
+  getStatusBadge: (status: string) => { label: string; variant: any };
+  formatDate: (dateString: string) => string;
+}) {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  // Group appointments by date (yyyy-MM-dd)
+  const appointmentsByDate = useMemo(() => {
+    const grouped: Record<string, any[]> = {};
+    appointments.forEach(apt => {
+      const date = format(startOfDay(new Date(apt.appointmentDate)), 'yyyy-MM-dd');
+      if (!grouped[date]) grouped[date] = [];
+      grouped[date].push(apt);
+    });
+    return grouped;
+  }, [appointments]);
+
+  // Get completed appointments
+  const completedAppointments = useMemo(() => {
+    return appointments
+      .filter(apt => apt.status === 'completed')
+      .sort((a, b) => new Date(b.appointmentDate).getTime() - new Date(a.appointmentDate).getTime());
+  }, [appointments]);
+
+  // Build calendar days
+  const calendarDays = useMemo(() => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
+    const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+    
+    // Add padding days to start on Sunday
+    const startDay = monthStart.getDay();
+    const paddingStart = Array(startDay).fill(null);
+    
+    return [...paddingStart, ...days];
+  }, [currentMonth]);
+
+  const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
+  const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+
+  const selectedDayAppointments = selectedDate ? (appointmentsByDate[selectedDate] || []) : [];
+
+  return (
+    <div className="space-y-6 mt-6">
+      {/* Calendar Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Agenda Visual - {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}</CardTitle>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrevMonth}
+                data-testid="button-prev-month"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentMonth(new Date())}
+                data-testid="button-today"
+              >
+                Hoje
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNextMonth}
+                data-testid="button-next-month"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {appointments.map((appointment: any) => (
-              <Card key={appointment.id} className="border-l-4 border-l-primary">
-                <CardContent className="pt-4">
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div>
-                      <h4 className="font-semibold text-foreground">{appointment.clientName}</h4>
-                      <p className="text-sm text-muted-foreground">{appointment.clientPhone}</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        <i className="fas fa-calendar mr-1"></i>
-                        {formatDate(appointment.appointmentDate)}
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <p className="font-medium">{appointment.service?.name || 'Serviço não encontrado'}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {appointment.service?.duration && `Duração: ${appointment.service.duration}`}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {appointment.service?.price && `Preço: ${appointment.service.price}`}
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Badge 
-                          variant={getStatusBadge(appointment.status).variant}
-                          data-testid={`status-${appointment.id}`}
+        </CardHeader>
+        <CardContent>
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-2">
+            {/* Week headers */}
+            {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
+              <div key={day} className="text-center font-semibold text-sm text-muted-foreground p-2">
+                {day}
+              </div>
+            ))}
+            
+            {/* Calendar days */}
+            {calendarDays.map((day, index) => {
+              if (!day) return <div key={`empty-${index}`} className="p-2" />;
+              
+              const dayKey = format(day, 'yyyy-MM-dd');
+              const dayAppointments = appointmentsByDate[dayKey] || [];
+              const isToday = isSameDay(day, new Date());
+              const isSelected = selectedDate === dayKey;
+              const hasAppointments = dayAppointments.length > 0;
+              
+              return (
+                <button
+                  key={dayKey}
+                  onClick={() => setSelectedDate(isSelected ? null : dayKey)}
+                  className={`
+                    min-h-[80px] p-2 rounded-lg border-2 transition-all text-left
+                    ${isToday ? 'border-primary bg-primary/5' : 'border-border'}
+                    ${isSelected ? 'ring-2 ring-primary bg-primary/10' : ''}
+                    ${hasAppointments ? 'hover:bg-muted cursor-pointer' : 'opacity-60'}
+                    ${!isSameMonth(day, currentMonth) ? 'opacity-30' : ''}
+                  `}
+                  data-testid={`calendar-day-${dayKey}`}
+                >
+                  <div className="font-semibold mb-1">{format(day, 'd')}</div>
+                  {hasAppointments && (
+                    <div className="space-y-1">
+                      {dayAppointments.slice(0, 2).map((apt, i) => (
+                        <div
+                          key={i}
+                          className={`text-xs px-1 py-0.5 rounded truncate ${
+                            apt.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                            apt.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            apt.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}
                         >
-                          {getStatusBadge(appointment.status).label}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-2">
-                        <Select
-                          value={appointment.status}
-                          onValueChange={(newStatus) => handleStatusChange(appointment.id, newStatus)}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">Pendente</SelectItem>
-                            <SelectItem value="confirmed">Confirmar</SelectItem>
-                            <SelectItem value="completed">Concluir</SelectItem>
-                            <SelectItem value="cancelled">Cancelar</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openWhatsApp(appointment)}
-                          className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
-                          data-testid={`whatsapp-appointment-${appointment.id}`}
-                        >
-                          <SiWhatsapp className="w-4 h-4 mr-1" />
-                          WhatsApp
-                        </Button>
-                        
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => {
-                            if (confirm('Tem certeza que deseja excluir este agendamento?')) {
-                              deleteAppointmentMutation.mutate(appointment.id);
-                            }
-                          }}
-                          data-testid={`delete-appointment-${appointment.id}`}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      
-                      {appointment.notes && (
-                        <div className="text-sm">
-                          <strong>Observações:</strong> {appointment.notes}
+                          {format(new Date(apt.appointmentDate), 'HH:mm')} - {apt.clientName.split(' ')[0]}
+                        </div>
+                      ))}
+                      {dayAppointments.length > 2 && (
+                        <div className="text-xs text-muted-foreground">
+                          +{dayAppointments.length - 2} mais
                         </div>
                       )}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  )}
+                </button>
+              );
+            })}
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+          {/* Selected Day Details */}
+          {selectedDate && selectedDayAppointments.length > 0 && (
+            <Card className="mt-6 border-primary">
+              <CardHeader>
+                <CardTitle className="text-lg">
+                  Agendamentos de {format(parseISO(selectedDate), "dd 'de' MMMM", { locale: ptBR })}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {selectedDayAppointments.map((apt: any) => (
+                    <Card key={apt.id} className="border-l-4 border-l-primary">
+                      <CardContent className="pt-4">
+                        <div className="grid md:grid-cols-3 gap-4">
+                          <div>
+                            <h4 className="font-semibold">{apt.clientName}</h4>
+                            <p className="text-sm text-muted-foreground">{apt.clientPhone}</p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              <i className="fas fa-clock mr-1"></i>
+                              {format(new Date(apt.appointmentDate), 'HH:mm')}
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <p className="font-medium">{apt.service?.name || 'Serviço não encontrado'}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {apt.service?.duration && `Duração: ${apt.service.duration}`}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {apt.service?.price && `Preço: ${apt.service.price}`}
+                            </p>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <Badge variant={getStatusBadge(apt.status).variant}>
+                              {getStatusBadge(apt.status).label}
+                            </Badge>
+                            
+                            <div className="flex flex-wrap gap-2">
+                              <Select
+                                value={apt.status}
+                                onValueChange={(newStatus) => onStatusChange(apt.id, newStatus)}
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">Pendente</SelectItem>
+                                  <SelectItem value="confirmed">Confirmar</SelectItem>
+                                  <SelectItem value="completed">Concluir</SelectItem>
+                                  <SelectItem value="cancelled">Cancelar</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onWhatsAppClick(apt)}
+                                className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
+                              >
+                                <SiWhatsapp className="w-4 h-4 mr-1" />
+                                WhatsApp
+                              </Button>
+                              
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  if (confirm('Tem certeza que deseja excluir este agendamento?')) {
+                                    onDelete(apt.id);
+                                  }
+                                }}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                            
+                            {apt.notes && (
+                              <div className="text-sm">
+                                <strong>Observações:</strong> {apt.notes}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Histórico de Atendimentos */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Histórico de Atendimentos</span>
+            <Badge variant="outline" data-testid="completed-count">
+              {completedAppointments.length} atendimentos concluídos
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {completedAppointments.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <i className="fas fa-history text-4xl mb-4 block"></i>
+              <p>Nenhum atendimento concluído ainda</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {completedAppointments.map((apt: any) => (
+                <Card key={apt.id} className="border-l-4 border-l-blue-500">
+                  <CardContent className="pt-4">
+                    <div className="grid md:grid-cols-4 gap-4">
+                      <div>
+                        <h4 className="font-semibold">{apt.clientName}</h4>
+                        <p className="text-sm text-muted-foreground">{apt.clientPhone}</p>
+                      </div>
+                      
+                      <div>
+                        <p className="font-medium">{apt.service?.name || 'Serviço não encontrado'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {apt.service?.price}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          <i className="fas fa-calendar mr-1"></i>
+                          {formatDate(apt.appointmentDate)}
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-center justify-end">
+                        <Badge variant="outline" className="bg-blue-50">Concluído</Badge>
+                      </div>
+                    </div>
+                    {apt.notes && (
+                      <div className="text-sm mt-2 text-muted-foreground">
+                        <strong>Observações:</strong> {apt.notes}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 

@@ -222,3 +222,42 @@ Todos os sistemas foram testados e estão funcionando corretamente:
   - Animação de pulso adicionada ao botão CTA principal (`.cta-pulse`)
   - Animação para ao passar o mouse (`:hover`) para não interferir com interação do usuário
   - **Vídeo Mobile - Remoção do Ícone de Play**: Removido o botão de play e texto "Toque para reproduzir" do vídeo mobile. Agora o vídeo reproduz automaticamente quando o usuário toca em qualquer lugar da tela, sem nenhum indicativo visual (overlay completamente invisível mantém funcionalidade de toque)
+
+## Novas Funcionalidades - Painel Admin (Setembro 30, 2025)
+
+### Agenda Visual com Calendário Mensal
+Implementado sistema completo de visualização de agendamentos no painel administrativo:
+
+**Calendário Visual Interativo**:
+- Grid de calendário mensal mostrando todos os dias do mês
+- Agendamentos exibidos em cada dia com cores por status:
+  - Verde: Confirmado
+  - Amarelo: Pendente
+  - Azul: Concluído
+  - Cinza: Cancelado
+- Máximo de 2 agendamentos visíveis por dia com contador de "+X mais"
+- Navegação entre meses (anterior/próximo/botão "Hoje")
+- Destaque visual para o dia atual (borda dourada)
+- Dias clicáveis que exibem painel de detalhes abaixo
+
+**Detalhes do Dia Selecionado**:
+- Painel expansível mostrando todos os agendamentos do dia selecionado
+- Informações completas: cliente, telefone, horário, serviço, duração, preço
+- Controles completos por agendamento: alterar status, enviar WhatsApp, excluir
+- Observações do cliente exibidas quando disponíveis
+
+**Histórico de Atendimentos**:
+- Seção dedicada mostrando apenas agendamentos concluídos
+- Ordenação reversa (mais recentes primeiro)
+- Layout compacto com informações essenciais
+- Badge visual "Concluído" para cada item
+- Contador de total de atendimentos concluídos
+
+**Implementação Técnica**:
+- Componente `AdminScheduleView` com lógica isolada
+- Uso eficiente de `useMemo` para agrupar agendamentos por data (O(1) lookups)
+- Reutilização de handlers e formatters do `AppointmentsManagement`
+- Integração com date-fns para manipulação de datas
+- Formatação de horários extraída de `appointmentDate` (format HH:mm)
+- Grid responsivo 7 colunas (semana completa)
+- Localização em português brasileiro (ptBR)
