@@ -1516,24 +1516,24 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-muted/30">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-serif font-bold text-foreground">Painel Administrativo</h1>
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">Painel Administrativo</h1>
             <p className="text-muted-foreground">Luccy Studio</p>
           </div>
-          <Button variant="outline" onClick={handleLogout} data-testid="button-logout">
+          <Button variant="outline" onClick={handleLogout} data-testid="button-logout" className="w-full sm:w-auto">
             <LogOut className="w-4 h-4 mr-2" />
             Sair
           </Button>
         </div>
 
         <Tabs defaultValue="appointments" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="appointments" data-testid="tab-appointments">Agendamentos</TabsTrigger>
-            <TabsTrigger value="services" data-testid="tab-services">Serviços</TabsTrigger>
-            <TabsTrigger value="products" data-testid="tab-products">Produtos</TabsTrigger>
-            <TabsTrigger value="testimonials" data-testid="tab-testimonials">Depoimentos</TabsTrigger>
-            <TabsTrigger value="gallery" data-testid="tab-gallery">Galeria</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+            <TabsTrigger value="appointments" data-testid="tab-appointments" className="text-xs sm:text-sm">Agendamentos</TabsTrigger>
+            <TabsTrigger value="services" data-testid="tab-services" className="text-xs sm:text-sm">Serviços</TabsTrigger>
+            <TabsTrigger value="products" data-testid="tab-products" className="text-xs sm:text-sm">Produtos</TabsTrigger>
+            <TabsTrigger value="testimonials" data-testid="tab-testimonials" className="text-xs sm:text-sm">Depoimentos</TabsTrigger>
+            <TabsTrigger value="gallery" data-testid="tab-gallery" className="text-xs sm:text-sm">Galeria</TabsTrigger>
           </TabsList>
 
           <TabsContent value="appointments">
