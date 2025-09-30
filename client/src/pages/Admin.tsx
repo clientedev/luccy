@@ -252,7 +252,7 @@ function AppointmentsManagement() {
               {appointments.map((appointment: any) => (
                 <Card key={appointment.id} className="border-l-4 border-l-primary">
                   <CardContent className="pt-4">
-                    <div className="grid md:grid-cols-3 gap-4">
+                    <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3">
                       <div>
                         <h4 className="font-semibold text-foreground">{appointment.clientName}</h4>
                         <p className="text-sm text-muted-foreground">{appointment.clientPhone}</p>
@@ -282,12 +282,12 @@ function AppointmentsManagement() {
                           </Badge>
                         </div>
                         
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-col sm:flex-row flex-wrap gap-2">
                           <Select
                             value={appointment.status}
                             onValueChange={(newStatus) => handleStatusChange(appointment.id, newStatus)}
                           >
-                            <SelectTrigger className="w-32">
+                            <SelectTrigger className="w-full sm:w-32">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -302,7 +302,7 @@ function AppointmentsManagement() {
                             variant="outline"
                             size="sm"
                             onClick={() => openWhatsApp(appointment)}
-                            className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
+                            className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700 w-full sm:w-auto"
                             data-testid={`whatsapp-appointment-${appointment.id}`}
                           >
                             <SiWhatsapp className="w-4 h-4 mr-1" />
@@ -318,6 +318,7 @@ function AppointmentsManagement() {
                               }
                             }}
                             data-testid={`delete-appointment-${appointment.id}`}
+                            className="w-full sm:w-auto"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -413,14 +414,15 @@ function AdminScheduleView({
       {/* Calendar Card */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Agenda Visual - {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}</CardTitle>
-            <div className="flex gap-2">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle className="text-lg sm:text-xl">Agenda Visual - {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}</CardTitle>
+            <div className="flex gap-2 justify-center sm:justify-start">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handlePrevMonth}
                 data-testid="button-prev-month"
+                className="flex-1 sm:flex-none"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -429,6 +431,7 @@ function AdminScheduleView({
                 size="sm"
                 onClick={() => setCurrentMonth(new Date())}
                 data-testid="button-today"
+                className="flex-1 sm:flex-none"
               >
                 Hoje
               </Button>
@@ -437,6 +440,7 @@ function AdminScheduleView({
                 size="sm"
                 onClick={handleNextMonth}
                 data-testid="button-next-month"
+                className="flex-1 sm:flex-none"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
@@ -445,10 +449,10 @@ function AdminScheduleView({
         </CardHeader>
         <CardContent>
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2">
             {/* Week headers */}
             {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
-              <div key={day} className="text-center font-semibold text-sm text-muted-foreground p-2">
+              <div key={day} className="text-center font-semibold text-xs sm:text-sm text-muted-foreground p-1 sm:p-2">
                 {day}
               </div>
             ))}
@@ -468,7 +472,7 @@ function AdminScheduleView({
                   key={dayKey}
                   onClick={() => setSelectedDate(isSelected ? null : dayKey)}
                   className={`
-                    min-h-[80px] p-2 rounded-lg border-2 transition-all text-left
+                    min-h-[60px] sm:min-h-[80px] p-1 sm:p-2 rounded-lg border-2 transition-all text-left
                     ${isToday ? 'border-primary bg-primary/5' : 'border-border'}
                     ${isSelected ? 'ring-2 ring-primary bg-primary/10' : ''}
                     ${hasAppointments ? 'hover:bg-muted cursor-pointer' : 'opacity-60'}
@@ -476,25 +480,25 @@ function AdminScheduleView({
                   `}
                   data-testid={`calendar-day-${dayKey}`}
                 >
-                  <div className="font-semibold mb-1">{format(day, 'd')}</div>
+                  <div className="font-semibold text-xs sm:text-base mb-1">{format(day, 'd')}</div>
                   {hasAppointments && (
-                    <div className="space-y-1">
+                    <div className="space-y-0.5 sm:space-y-1">
                       {dayAppointments.slice(0, 2).map((apt, i) => (
                         <div
                           key={i}
-                          className={`text-xs px-1 py-0.5 rounded truncate ${
+                          className={`text-[10px] sm:text-xs px-0.5 sm:px-1 py-0.5 rounded truncate ${
                             apt.status === 'confirmed' ? 'bg-green-100 text-green-800' :
                             apt.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                             apt.status === 'completed' ? 'bg-blue-100 text-blue-800' :
                             'bg-gray-100 text-gray-800'
                           }`}
                         >
-                          {format(new Date(apt.appointmentDate), 'HH:mm')} - {apt.clientName.split(' ')[0]}
+                          <span className="hidden sm:inline">{format(new Date(apt.appointmentDate), 'HH:mm')} - </span>{apt.clientName.split(' ')[0]}
                         </div>
                       ))}
                       {dayAppointments.length > 2 && (
-                        <div className="text-xs text-muted-foreground">
-                          +{dayAppointments.length - 2} mais
+                        <div className="text-[10px] sm:text-xs text-muted-foreground">
+                          +{dayAppointments.length - 2}
                         </div>
                       )}
                     </div>
@@ -517,7 +521,7 @@ function AdminScheduleView({
                   {selectedDayAppointments.map((apt: any) => (
                     <Card key={apt.id} className="border-l-4 border-l-primary">
                       <CardContent className="pt-4">
-                        <div className="grid md:grid-cols-3 gap-4">
+                        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3">
                           <div>
                             <h4 className="font-semibold">{apt.clientName}</h4>
                             <p className="text-sm text-muted-foreground">{apt.clientPhone}</p>
@@ -542,12 +546,12 @@ function AdminScheduleView({
                               {getStatusBadge(apt.status).label}
                             </Badge>
                             
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-col sm:flex-row flex-wrap gap-2">
                               <Select
                                 value={apt.status}
                                 onValueChange={(newStatus) => onStatusChange(apt.id, newStatus)}
                               >
-                                <SelectTrigger className="w-32">
+                                <SelectTrigger className="w-full sm:w-32">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -562,7 +566,7 @@ function AdminScheduleView({
                                 variant="outline"
                                 size="sm"
                                 onClick={() => onWhatsAppClick(apt)}
-                                className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
+                                className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700 w-full sm:w-auto"
                               >
                                 <SiWhatsapp className="w-4 h-4 mr-1" />
                                 WhatsApp
@@ -576,6 +580,7 @@ function AdminScheduleView({
                                     onDelete(apt.id);
                                   }
                                 }}
+                                className="w-full sm:w-auto"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -619,7 +624,7 @@ function AdminScheduleView({
               {completedAppointments.map((apt: any) => (
                 <Card key={apt.id} className="border-l-4 border-l-blue-500">
                   <CardContent className="pt-4">
-                    <div className="grid md:grid-cols-4 gap-4">
+                    <div className="flex flex-col gap-2 sm:gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4">
                       <div>
                         <h4 className="font-semibold">{apt.clientName}</h4>
                         <p className="text-sm text-muted-foreground">{apt.clientPhone}</p>
@@ -639,7 +644,7 @@ function AdminScheduleView({
                         </p>
                       </div>
                       
-                      <div className="flex items-center justify-end">
+                      <div className="flex items-center sm:justify-end">
                         <Badge variant="outline" className="bg-blue-50">Concluído</Badge>
                       </div>
                     </div>
