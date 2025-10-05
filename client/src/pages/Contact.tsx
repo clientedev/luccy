@@ -141,7 +141,7 @@ export default function Contact() {
           <h4 className="text-lg font-semibold text-foreground mb-6">Siga-nos nas Redes Sociais</h4>
           <div className="flex justify-center space-x-6">
             <a
-              href="https://instagram.com/luccystudio"
+              href="https://www.instagram.com/luccystudio_/"
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 bg-primary/10 hover:bg-primary/20 rounded-full flex items-center justify-center transition-colors"

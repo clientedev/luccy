@@ -16,7 +16,7 @@ const services = [
 ];
 
 const socialLinks = [
-  { name: "Instagram", icon: "fab fa-instagram", href: "https://instagram.com/luccystudio" },
+  { name: "Instagram", icon: "fab fa-instagram", href: "https://www.instagram.com/luccystudio_/" },
   { name: "TikTok", icon: "fab fa-tiktok", href: "https://tiktok.com/@luccystudio" },
   { name: "Facebook", icon: "fab fa-facebook", href: "https://facebook.com/luccystudio" },
   { name: "WhatsApp", icon: "fab fa-whatsapp", href: "https://wa.me/5511944555381" },

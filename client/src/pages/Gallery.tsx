@@ -121,12 +121,12 @@ export default function Gallery() {
 
             <Button asChild className="bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg" data-testid="button-instagram">
               <a
-                href="https://instagram.com/luccystudio"
+                href="https://www.instagram.com/luccystudio_/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <i className="fab fa-instagram mr-2"></i>
-                @luccystudio
+                @luccystudio_
               </a>
             </Button>
           </CardContent>
