@@ -936,7 +936,9 @@ function ProductsManagement() {
     description: "",
     price: "",
     categoryId: "",
-    imageUrl: "",
+    image1: "",
+    image2: "",
+    image3: "",
     inStock: true,
   });
 
@@ -950,6 +952,27 @@ function ProductsManagement() {
   const { data: categories } = useQuery({
     queryKey: ["/api/categories"],
   });
+
+  const handleImageUpload = (imageNumber: 1 | 2 | 3) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Arquivo muito grande",
+        description: "A imagem deve ter no máximo 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setFormData(prev => ({ ...prev, [`image${imageNumber}`]: base64String }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const createMutation = useMutation({
     mutationFn: (data: any) => apiRequest("POST", "/api/products", data),
@@ -986,7 +1009,9 @@ function ProductsManagement() {
       description: "",
       price: "",
       categoryId: "",
-      imageUrl: "",
+      image1: "",
+      image2: "",
+      image3: "",
       inStock: true,
     });
     setEditingProduct(null);
@@ -1013,7 +1038,9 @@ function ProductsManagement() {
       description: product.description || "",
       price: product.price,
       categoryId: product.categoryId || "",
-      imageUrl: product.imageUrl || "",
+      image1: product.image1 || "",
+      image2: product.image2 || "",
+      image3: product.image3 || "",
       inStock: product.inStock,
     });
     setIsDialogOpen(true);
@@ -1083,15 +1110,52 @@ function ProductsManagement() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="imageUrl">URL da Imagem</Label>
-                <Input
-                  id="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
-                  placeholder="https://exemplo.com/imagem.jpg"
-                  data-testid="input-product-image"
-                />
+              <div className="space-y-3">
+                <Label>Imagens do Produto (até 3)</Label>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <Label htmlFor="image1" className="text-sm text-muted-foreground">Imagem 1</Label>
+                    <Input
+                      id="image1"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload(1)}
+                      data-testid="input-product-image1"
+                      className="cursor-pointer"
+                    />
+                    {formData.image1 && (
+                      <img src={formData.image1} alt="Preview 1" className="mt-2 w-full h-20 object-cover rounded" />
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="image2" className="text-sm text-muted-foreground">Imagem 2</Label>
+                    <Input
+                      id="image2"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload(2)}
+                      data-testid="input-product-image2"
+                      className="cursor-pointer"
+                    />
+                    {formData.image2 && (
+                      <img src={formData.image2} alt="Preview 2" className="mt-2 w-full h-20 object-cover rounded" />
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="image3" className="text-sm text-muted-foreground">Imagem 3</Label>
+                    <Input
+                      id="image3"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload(3)}
+                      data-testid="input-product-image3"
+                      className="cursor-pointer"
+                    />
+                    {formData.image3 && (
+                      <img src={formData.image3} alt="Preview 3" className="mt-2 w-full h-20 object-cover rounded" />
+                    )}
+                  </div>
+                </div>
               </div>
               <div className="flex items-center space-x-2">
                 <Switch
@@ -1124,9 +1188,9 @@ function ProductsManagement() {
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex gap-4 flex-1">
-                    {product.imageUrl && (
+                    {product.image1 && (
                       <img
-                        src={product.imageUrl}
+                        src={product.image1}
                         alt={product.name}
                         className="w-16 h-16 object-cover rounded-lg"
                         data-testid={`product-image-${product.id}`}

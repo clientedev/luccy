@@ -24,7 +24,9 @@ export const products = pgTable("products", {
   description: text("description"),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   categoryId: varchar("category_id").references(() => categories.id),
-  imageUrl: text("image_url"),
+  image1: text("image1"),
+  image2: text("image2"),
+  image3: text("image3"),
   inStock: boolean("in_stock").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
