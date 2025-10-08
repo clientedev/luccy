@@ -19,22 +19,24 @@ export async function seedCategories() {
     ];
 
     for (const category of categories) {
-      // Verifica se a categoria já existe
-      const existing = await pool.query(
-        'SELECT id FROM categories WHERE slug = $1',
-        [category.slug]
-      );
-
-      if (existing.rows.length === 0) {
-        // Adiciona a categoria se não existir
-        await pool.query(
+      try {
+        // Usa INSERT ... ON CONFLICT para evitar duplicatas
+        const result = await pool.query(
           `INSERT INTO categories (id, name, slug, description, created_at) 
-           VALUES (gen_random_uuid(), $1, $2, $3, NOW())`,
+           VALUES (gen_random_uuid(), $1, $2, $3, NOW())
+           ON CONFLICT (slug) DO NOTHING
+           RETURNING id`,
           [category.name, category.slug, category.description]
         );
-        console.log(`✓ Categoria "${category.name}" adicionada`);
-      } else {
-        console.log(`✓ Categoria "${category.name}" já existe`);
+
+        if (result.rows.length > 0) {
+          console.log(`✓ Categoria "${category.name}" adicionada`);
+        } else {
+          console.log(`✓ Categoria "${category.name}" já existe`);
+        }
+      } catch (error) {
+        // Se mesmo com ON CONFLICT der erro, apenas avisa
+        console.log(`✓ Categoria "${category.name}" já existe ou erro: ${error}`);
       }
     }
 
