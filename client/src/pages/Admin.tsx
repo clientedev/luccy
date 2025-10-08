@@ -982,6 +982,13 @@ function ProductsManagement() {
       resetForm();
       toast({ title: "Produto criado com sucesso!" });
     },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao criar produto",
+        description: error?.message || "Ocorreu um erro ao criar o produto. Tente novamente.",
+        variant: "destructive",
+      });
+    },
   });
 
   const updateMutation = useMutation({
@@ -993,6 +1000,13 @@ function ProductsManagement() {
       resetForm();
       toast({ title: "Produto atualizado com sucesso!" });
     },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao atualizar produto",
+        description: error?.message || "Ocorreu um erro ao atualizar o produto. Tente novamente.",
+        variant: "destructive",
+      });
+    },
   });
 
   const deleteMutation = useMutation({
@@ -1000,6 +1014,13 @@ function ProductsManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Produto excluído com sucesso!" });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir produto",
+        description: error?.message || "Ocorreu um erro ao excluir o produto. Tente novamente.",
+        variant: "destructive",
+      });
     },
   });
 
