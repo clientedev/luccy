@@ -189,7 +189,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof ZodError) {
         res.status(400).json({ message: 'Dados inválidos', errors: error.errors });
       } else {
-        res.status(500).json({ message: 'Erro ao criar produto' });
+        console.error('Erro ao criar produto:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+        res.status(500).json({ message: 'Erro ao criar produto', details: errorMessage });
       }
     }
   });

@@ -756,10 +756,17 @@ function ServicesManagement() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const data = {
+      ...formData,
+      description: formData.description || null,
+      price: formData.price || null,
+      duration: formData.duration || null,
+    };
+    
     if (editingService) {
-      updateMutation.mutate({ id: editingService.id, data: formData });
+      updateMutation.mutate({ id: editingService.id, data });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(data);
     }
   };
 
@@ -1043,6 +1050,11 @@ function ProductsManagement() {
     const data = {
       ...formData,
       price: formData.price.toString(),
+      categoryId: formData.categoryId || null,
+      image1: formData.image1 || null,
+      image2: formData.image2 || null,
+      image3: formData.image3 || null,
+      description: formData.description || null,
     };
     
     if (editingProduct) {
@@ -1421,7 +1433,12 @@ function GalleryManagement() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    const data = {
+      ...formData,
+      title: formData.title || null,
+      category: formData.category || null,
+    };
+    createMutation.mutate(data);
   };
 
   return (
