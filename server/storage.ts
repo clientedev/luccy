@@ -168,25 +168,25 @@ export class DatabaseStorage implements IStorage {
         await Promise.all([
           this.createGalleryImage({
             title: 'Extensão de Cílios Volume Russo',
-            imageUrl: 'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=400',
+            image: 'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=400',
             category: 'cilios',
             featured: true
           }),
           this.createGalleryImage({
             title: 'Nail Art Dourada',
-            imageUrl: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400',
+            image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400',
             category: 'unhas',
             featured: true
           }),
           this.createGalleryImage({
             title: 'Cabelo com Luzes',
-            imageUrl: 'https://images.unsplash.com/photo-1560264280-88b68371db39?w=400',
+            image: 'https://images.unsplash.com/photo-1560264280-88b68371db39?w=400',
             category: 'cabelo',
             featured: true
           }),
           this.createGalleryImage({
             title: 'Maquiagem para Noiva',
-            imageUrl: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400',
+            image: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400',
             category: 'maquiagem',
             featured: true
           })
@@ -645,7 +645,9 @@ export class MemoryStorage implements IStorage {
       description: product.description ?? null,
       price: product.price,
       categoryId: product.categoryId ?? null,
-      imageUrl: product.imageUrl ?? null,
+      image1: product.image1 ?? null,
+      image2: product.image2 ?? null,
+      image3: product.image3 ?? null,
       inStock: product.inStock ?? null,
       createdAt: new Date()
     };
@@ -753,7 +755,7 @@ export class MemoryStorage implements IStorage {
     const newImage: GalleryImage = {
       id: this.generateId(),
       title: image.title ?? null,
-      imageUrl: image.imageUrl,
+      image: image.image,
       category: image.category ?? null,
       featured: image.featured ?? null,
       createdAt: new Date()

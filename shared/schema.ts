@@ -54,7 +54,7 @@ export const testimonials = pgTable("testimonials", {
 export const galleryImages = pgTable("gallery_images", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title"),
-  imageUrl: text("image_url").notNull(),
+  image: text("image").notNull(),
   category: text("category"), // 'makeup', 'hair', 'nails', 'lashes'
   featured: boolean("featured").default(false),
   createdAt: timestamp("created_at").defaultNow(),

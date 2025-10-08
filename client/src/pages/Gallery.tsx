@@ -79,7 +79,7 @@ export default function Gallery() {
               {galleryImages.map((image: any) => (
                 <div key={image.id} className="group relative overflow-hidden rounded-xl">
                   <img
-                    src={image.imageUrl}
+                    src={image.image}
                     alt={image.title || 'Trabalho do Luccy Studio'}
                     className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
                     data-testid={`admin-gallery-image-${image.id}`}

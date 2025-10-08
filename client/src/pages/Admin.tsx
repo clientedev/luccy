@@ -1392,7 +1392,7 @@ function GalleryManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
-    imageUrl: "",
+    image: "",
     category: "",
     featured: false,
   });
@@ -1425,7 +1425,7 @@ function GalleryManagement() {
   const resetForm = () => {
     setFormData({
       title: "",
-      imageUrl: "",
+      image: "",
       category: "",
       featured: false,
     });
@@ -1467,11 +1467,21 @@ function GalleryManagement() {
                 />
               </div>
               <div>
-                <Label htmlFor="imageUrl">URL da Imagem</Label>
+                <Label htmlFor="image">Anexar Imagem</Label>
                 <Input
-                  id="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setFormData(prev => ({ ...prev, image: reader.result as string }));
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
                   required
                   data-testid="input-gallery-image"
                 />
@@ -1520,7 +1530,7 @@ function GalleryManagement() {
             <Card key={image.id} className="overflow-hidden">
               <div className="relative">
                 <img
-                  src={image.imageUrl}
+                  src={image.image}
                   alt={image.title || 'Imagem da galeria'}
                   className="w-full h-48 object-cover"
                   data-testid={`gallery-admin-image-${image.id}`}
