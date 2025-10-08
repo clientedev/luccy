@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
 import { ensureDatabaseSetup, diagnoseDatabaseIssues } from "./migrate";
+import { seedCategories } from "./seed-categories";
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -42,12 +43,15 @@ app.use((req, res, next) => {
   // 1. Verificar e configurar banco de dados
   await ensureDatabaseSetup();
   
-  // 2. Executar diagnóstico (apenas em desenvolvimento)
+  // 2. Adicionar categorias padrão (incluindo Roupas)
+  await seedCategories();
+  
+  // 3. Executar diagnóstico (apenas em desenvolvimento)
   if (app.get("env") === "development") {
     await diagnoseDatabaseIssues();
   }
 
-  // 3. Initialize database seed data
+  // 4. Initialize database seed data
   try {
     if (typeof (storage as any).initializeSeedData === 'function') {
       log('Initializing database seed data...');
