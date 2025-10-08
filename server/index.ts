@@ -44,7 +44,12 @@ app.use((req, res, next) => {
   await ensureDatabaseSetup();
   
   // 2. Adicionar categorias padrão (incluindo Roupas)
-  await seedCategories();
+  try {
+    await seedCategories();
+  } catch (error) {
+    log(`Warning: Could not seed categories: ${error}`);
+    // Continue - não é crítico para o funcionamento do app
+  }
   
   // 3. Executar diagnóstico (apenas em desenvolvimento)
   if (app.get("env") === "development") {
