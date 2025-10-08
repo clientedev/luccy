@@ -1,0 +1,52 @@
+2025-10-02 12:03:30.724 UTC [12057] ERROR:  update or delete on table "services" violates foreign key constraint "service_hours_service_id_services_id_fk" on table "service_hours"
+2025-10-02 12:03:30.724 UTC [12057] DETAIL:  Key (id)=(828c3a4f-2244-4140-9f9e-223d37ee6955) is still referenced from table "service_hours".
+2025-10-02 12:03:30.724 UTC [12057] STATEMENT:  delete from "services" where "services"."id" = $1
+2025-10-02 12:03:32.782 UTC [12061] ERROR:  update or delete on table "services" violates foreign key constraint "service_hours_service_id_services_id_fk" on table "service_hours"
+2025-10-02 12:03:32.782 UTC [12061] DETAIL:  Key (id)=(828c3a4f-2244-4140-9f9e-223d37ee6955) is still referenced from table "service_hours".
+2025-10-02 12:03:32.782 UTC [12061] STATEMENT:  delete from "services" where "services"."id" = $1
+2025-10-02 12:03:38.639 UTC [12062] ERROR:  update or delete on table "services" violates foreign key constraint "service_hours_service_id_services_id_fk" on table "service_hours"
+2025-10-02 12:03:38.639 UTC [12062] DETAIL:  Key (id)=(828c3a4f-2244-4140-9f9e-223d37ee6955) is still referenced from table "service_hours".
+2025-10-02 12:03:38.639 UTC [12062] STATEMENT:  delete from "services" where "services"."id" = $1
+2025-10-02 12:03:40.373 UTC [12063] ERROR:  update or delete on table "services" violates foreign key constraint "service_hours_service_id_services_id_fk" on table "service_hours"
+2025-10-02 12:03:40.373 UTC [12063] DETAIL:  Key (id)=(828c3a4f-2244-4140-9f9e-223d37ee6955) is still referenced from table "service_hours".
+2025-10-02 12:03:40.373 UTC [12063] STATEMENT:  delete from "services" where "services"."id" = $1
+2025-10-02 12:03:56.373 UTC [12065] ERROR:  update or delete on table "services" violates foreign key constraint "service_hours_service_id_services_id_fk" on table "service_hours"
+2025-10-02 12:03:56.373 UTC [12065] DETAIL:  Key (id)=(828c3a4f-2244-4140-9f9e-223d37ee6955) is still referenced from table "service_hours".
+2025-10-02 12:03:56.373 UTC [12065] STATEMENT:  delete from "services" where "services"."id" = $1
+2025-10-02 12:04:11.838 UTC [12069] ERROR:  update or delete on table "services" violates foreign key constraint "service_hours_service_id_services_id_fk" on table "service_hours"
+2025-10-02 12:04:11.838 UTC [12069] DETAIL:  Key (id)=(828c3a4f-2244-4140-9f9e-223d37ee6955) is still referenced from table "service_hours".
+2025-10-02 12:04:11.838 UTC [12069] STATEMENT:  delete from "public"."services" where "id" in ('828c3a4f-2244-4140-9f9e-223d37ee6955')
+2025-10-02 12:07:55.347 UTC [76] LOG:  checkpoint starting: time
+2025-10-02 12:07:57.309 UTC [76] LOG:  checkpoint complete: wrote 20 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.918 s, sync=0.005 s, total=1.962 s; sync files=18, longest=0.004 s, average=0.001 s; distance=53 kB, estimate=87 kB; lsn=0/1A7D7D8, redo lsn=0/1A7D780
+2025-10-02 12:12:55.407 UTC [76] LOG:  checkpoint starting: time
+2025-10-02 12:12:55.730 UTC [76] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.309 s, sync=0.005 s, total=0.324 s; sync files=4, longest=0.003 s, average=0.002 s; distance=9 kB, estimate=79 kB; lsn=0/1A7FF18, redo lsn=0/1A7FEC0
+2025-10-02 12:27:56.027 UTC [76] LOG:  checkpoint starting: time
+2025-10-02 12:27:56.347 UTC [76] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.303 s, sync=0.004 s, total=0.320 s; sync files=4, longest=0.003 s, average=0.001 s; distance=11 kB, estimate=72 kB; lsn=0/1A82D00, redo lsn=0/1A82CA8
+2025-10-02 12:32:56.444 UTC [76] LOG:  checkpoint starting: time
+2025-10-02 12:32:56.768 UTC [76] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.305 s, sync=0.006 s, total=0.325 s; sync files=4, longest=0.004 s, average=0.002 s; distance=7 kB, estimate=66 kB; lsn=0/1A84B18, redo lsn=0/1A84AC0
+2025-10-02 12:47:57.067 UTC [76] LOG:  checkpoint starting: time
+2025-10-02 12:47:57.188 UTC [76] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.103 s, sync=0.004 s, total=0.121 s; sync files=2, longest=0.003 s, average=0.002 s; distance=4 kB, estimate=60 kB; lsn=0/1A85DD8, redo lsn=0/1A85D80
+2025-10-02 13:42:58.282 UTC [76] LOG:  checkpoint starting: time
+2025-10-02 13:42:58.606 UTC [76] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.305 s, sync=0.008 s, total=0.324 s; sync files=4, longest=0.007 s, average=0.002 s; distance=7 kB, estimate=54 kB; lsn=0/1A87D60, redo lsn=0/1A87D08
+2025-10-07 13:50:20.899 UTC [76] LOG:  checkpoint starting: time
+2025-10-07 13:50:21.731 UTC [76] LOG:  checkpoint complete: wrote 9 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.810 s, sync=0.006 s, total=0.832 s; sync files=7, longest=0.005 s, average=0.001 s; distance=24 kB, estimate=51 kB; lsn=0/1A8DF78, redo lsn=0/1A8DF20
+2025-10-07 14:05:21.032 UTC [76] LOG:  checkpoint starting: time
+2025-10-07 14:05:21.264 UTC [76] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.214 s, sync=0.006 s, total=0.233 s; sync files=3, longest=0.005 s, average=0.002 s; distance=1 kB, estimate=46 kB; lsn=0/1A8E3E0, redo lsn=0/1A8E388
+2025-10-08 17:13:15.591 UTC [39088] ERROR:  column "image1" does not exist at character 61
+2025-10-08 17:13:15.591 UTC [39088] STATEMENT:  select "id", "name", "description", "price", "category_id", "image1", "image2", "image3", "in_stock", "created_at" from "products" order by "products"."created_at" desc
+2025-10-08 17:13:33.795 UTC [39092] ERROR:  column "image1" of relation "products" does not exist at character 78
+2025-10-08 17:13:33.795 UTC [39092] STATEMENT:  insert into "products" ("id", "name", "description", "price", "category_id", "image1", "image2", "image3", "in_stock", "created_at") values (default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning "id", "name", "description", "price", "category_id", "image1", "image2", "image3", "in_stock", "created_at"
+2025-10-08 17:15:53.533 UTC [76] LOG:  checkpoint starting: time
+2025-10-08 17:15:54.067 UTC [76] LOG:  checkpoint complete: wrote 6 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.505 s, sync=0.006 s, total=0.535 s; sync files=6, longest=0.005 s, average=0.001 s; distance=17 kB, estimate=43 kB; lsn=0/1A92988, redo lsn=0/1A92930
+2025-10-08 17:24:58.648 UTC [39130] ERROR:  column "image1" does not exist at character 61
+2025-10-08 17:24:58.648 UTC [39130] STATEMENT:  select "id", "name", "description", "price", "category_id", "image1", "image2", "image3", "in_stock", "created_at" from "products" order by "products"."created_at" desc
+2025-10-08 17:25:09.645 UTC [39134] ERROR:  column "image1" of relation "products" does not exist at character 78
+2025-10-08 17:25:09.645 UTC [39134] STATEMENT:  insert into "products" ("id", "name", "description", "price", "category_id", "image1", "image2", "image3", "in_stock", "created_at") values (default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning "id", "name", "description", "price", "category_id", "image1", "image2", "image3", "in_stock", "created_at"
+2025-10-08 17:25:12.008 UTC [39135] ERROR:  column "image1" of relation "products" does not exist at character 78
+2025-10-08 17:25:12.008 UTC [39135] STATEMENT:  insert into "products" ("id", "name", "description", "price", "category_id", "image1", "image2", "image3", "in_stock", "created_at") values (default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning "id", "name", "description", "price", "category_id", "image1", "image2", "image3", "in_stock", "created_at"
+2025-10-08 17:25:12.559 UTC [39136] ERROR:  column "image1" of relation "products" does not exist at character 78
+2025-10-08 17:25:12.559 UTC [39136] STATEMENT:  insert into "products" ("id", "name", "description", "price", "category_id", "image1", "image2", "image3", "in_stock", "created_at") values (default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning "id", "name", "description", "price", "category_id", "image1", "image2", "image3", "in_stock", "created_at"
+2025-10-08 17:25:53.264 UTC [76] LOG:  checkpoint starting: time
+2025-10-08 17:25:53.690 UTC [76] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.404 s, sync=0.007 s, total=0.426 s; sync files=5, longest=0.005 s, average=0.002 s; distance=7 kB, estimate=40 kB; lsn=0/1A94768, redo lsn=0/1A94710
+2025-10-08 17:35:53.884 UTC [76] LOG:  checkpoint starting: time
+2025-10-08 17:35:54.008 UTC [76] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.105 s, sync=0.007 s, total=0.124 s; sync files=2, longest=0.006 s, average=0.004 s; distance=7 kB, estimate=36 kB; lsn=0/1A96450, redo lsn=0/1A963F8
