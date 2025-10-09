@@ -1,0 +1,23 @@
+# Ignore development files to speed up build
+node_modules
+.git
+.env
+.env.local
+*.log
+npm-debug.log*
+.DS_Store
+.replit
+.upm
+replit.nix
+.cache
+.vscode
+.idea
+
+# Ignore docs to reduce build size
+*.md
+!README.md
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+__tests__

@@ -14,7 +14,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // CRITICAL: Healthcheck must be FIRST and ALWAYS respond immediately
-// Railway healthcheck cannot wait for DB, routes, or anything else
 app.get('/health', (_req, res) => {
   res.status(200).json({ 
     status: 'ok', 
@@ -88,23 +87,20 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     });
   });
 
-  // NOW the server is listening and healthcheck is responding
-  // Everything below runs in background and won't affect healthcheck
-
-  // Database initialization - completely async
+  // Database initialization - completely async, never fails startup
   const initializeDatabase = async () => {
     try {
-      if (process.env.NODE_ENV === 'production') {
-        log('Production mode - skipping database setup (already done in build)');
-      } else {
-        await ensureDatabaseSetup();
-        
-        try {
-          await seedCategories();
-        } catch (error) {
-          log(`Warning: Could not seed categories: ${error}`);
-        }
-        
+      // Always run migrations in production (Railway doesn't run them in build anymore)
+      await ensureDatabaseSetup();
+      
+      try {
+        await seedCategories();
+      } catch (error) {
+        log(`Warning: Could not seed categories: ${error}`);
+      }
+      
+      // Only diagnose in development
+      if (process.env.NODE_ENV !== 'production') {
         await diagnoseDatabaseIssues();
       }
 
@@ -115,13 +111,14 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       }
     } catch (error) {
       log(`Error during database initialization: ${error}`);
+      // Never crash - server must stay up
     }
   };
 
   // App initialization - completely async
   const initializeApp = async () => {
     try {
-      // Register routes (may depend on database for sessions)
+      // Register routes
       await registerRoutes(app, server);
       log('✅ Routes registered successfully');
 
@@ -139,13 +136,11 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       if (error instanceof Error && error.stack) {
         log(error.stack);
       }
-      // Don't crash - server should keep running for healthcheck
     }
   };
 
-  // Start background initialization - server is already listening
+  // Start background initialization
   initializeApp().catch(err => {
     log(`Fatal error during initialization: ${err}`);
-    // Don't crash - server must stay up for Railway healthcheck
   });
 })();
