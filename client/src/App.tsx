@@ -15,6 +15,7 @@ import Agendamentos from "@/pages/Agendamentos";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ScrollToTop from "@/components/ScrollToTop";
 
 function Router() {
   return (
@@ -36,6 +37,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <ScrollToTop />
         <div className="min-h-screen flex flex-col">
           <Header />
           <main className="flex-1">
