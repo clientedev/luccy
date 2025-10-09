@@ -2,6 +2,14 @@
 
 Luccy Studio is a beauty salon website built with React, TypeScript, and Express.js, featuring a modern design with a nude, gold, black, and white color palette. It functions as both a business showcase and an e-commerce platform for services like hair, nails, eyelashes, and makeup. The application includes a public-facing site with service listings, product catalog, gallery, and contact information, alongside an administrative panel for content management. It is designed to be fully responsive across all devices. The project aims to provide a comprehensive online presence for Luccy Studio, enhancing client engagement and streamlining business operations.
 
+# Recent Changes
+
+## October 09, 2025
+- **Scroll to Top**: Implemented automatic scroll to top when navigating between pages using ScrollToTop component.
+- **Error Handling**: Enhanced queryClient with better error logging and retry logic for Railway deployment.
+- **Railway Configuration**: Added scripts for Railway deployment and updated documentation (RAILWAY.md).
+- **Query Client**: Added retry logic (1 retry) for transient errors in production.
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
