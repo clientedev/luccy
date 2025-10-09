@@ -7,8 +7,11 @@ Luccy Studio is a beauty salon website built with React, TypeScript, and Express
 ## October 09, 2025
 - **Scroll to Top**: Implemented automatic scroll to top when navigating between pages using ScrollToTop component.
 - **Error Handling**: Enhanced queryClient with better error logging and retry logic for Railway deployment.
-- **Railway Configuration**: Added scripts for Railway deployment and updated documentation (RAILWAY.md).
+- **Railway Configuration**: Fixed error 502 with proper healthcheck endpoint, proxy trust, and session configuration.
 - **Query Client**: Added retry logic (1 retry) for transient errors in production.
+- **Healthcheck Endpoint**: Added `/health` endpoint for Railway healthcheck monitoring.
+- **Session Configuration**: Changed `sameSite` to 'lax' for better Railway compatibility.
+- **Documentation**: Created RAILWAY.md and RAILWAY-QUICK-START.md with complete deployment guides.
 
 # User Preferences
 
