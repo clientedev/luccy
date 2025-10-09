@@ -52,35 +52,39 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // 1. Verificar e configurar banco de dados
-  await ensureDatabaseSetup();
-  
-  // 2. Adicionar categorias padrão (incluindo Roupas)
-  try {
-    await seedCategories();
-  } catch (error) {
-    log(`Warning: Could not seed categories: ${error}`);
-    // Continue - não é crítico para o funcionamento do app
-  }
-  
-  // 3. Executar diagnóstico (apenas em desenvolvimento)
-  if (app.get("env") === "development") {
-    await diagnoseDatabaseIssues();
-  }
-
-  // 4. Initialize database seed data
-  try {
-    if (typeof (storage as any).initializeSeedData === 'function') {
-      log('Initializing database seed data...');
-      await (storage as any).initializeSeedData();
-      log('Database seed data initialized successfully');
-    }
-  } catch (error) {
-    log(`Error initializing seed data: ${error}`);
-    // Continue execution even if seed data fails - the app should still work
-  }
-
   const server = await registerRoutes(app);
+
+  // Database initialization - run in background after server is ready
+  const initializeDatabase = async () => {
+    try {
+      // Em produção (Railway), as migrações já rodaram no build
+      // Então apenas fazemos verificações rápidas
+      if (process.env.NODE_ENV === 'production') {
+        log('Production mode - skipping database setup (already done in build)');
+      } else {
+        // Em desenvolvimento, executar setup completo
+        await ensureDatabaseSetup();
+        
+        try {
+          await seedCategories();
+        } catch (error) {
+          log(`Warning: Could not seed categories: ${error}`);
+        }
+        
+        await diagnoseDatabaseIssues();
+      }
+
+      // Initialize seed data if available
+      if (typeof (storage as any).initializeSeedData === 'function') {
+        log('Initializing database seed data...');
+        await (storage as any).initializeSeedData();
+        log('Database seed data initialized successfully');
+      }
+    } catch (error) {
+      log(`Error during database initialization: ${error}`);
+      // Continue - app should still work
+    }
+  };
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -114,5 +118,10 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Initialize database in background (non-blocking)
+    initializeDatabase().catch(err => {
+      log(`Background database initialization failed: ${err}`);
+    });
   });
 })();
