@@ -44,8 +44,9 @@ npm run start
 ### 4. Deploy Settings
 
 - **Root Directory**: `/` (raiz do projeto)
-- **Healthcheck Path**: `/api/health` (se tiver)
-- **Restart Policy**: Always
+- **Healthcheck Path**: `/health` (IMPORTANTE: endpoint de healthcheck configurado)
+- **Healthcheck Timeout**: 100 segundos
+- **Restart Policy**: ON_FAILURE com 10 tentativas
 
 ## 🔧 Scripts Disponíveis
 
@@ -74,6 +75,46 @@ npm run db:seed-categories
 ```
 
 ## 🐛 Troubleshooting
+
+### Problema: Erro 502 - Application failed to respond
+
+**Causa**: A aplicação não está respondendo ou crashando ao iniciar.
+
+**Soluções**:
+
+1. **Verificar Healthcheck**:
+   - O endpoint `/health` deve estar respondendo
+   - Configure no Railway: Healthcheck Path = `/health`
+   - Timeout: 100 segundos
+
+2. **Verificar Variáveis de Ambiente**:
+   ```bash
+   # Obrigatórias
+   DATABASE_URL=postgresql://...
+   SESSION_SECRET=minimo_32_caracteres_aleatorios
+   NODE_ENV=production
+   PORT=5000
+   ```
+
+3. **Verificar Logs do Railway**:
+   ```bash
+   railway logs --tail
+   ```
+   - Procure por erros de conexão com banco
+   - Verifique se o servidor está iniciando na porta correta
+
+4. **Cookies e Sessões**:
+   - O app usa `sameSite: 'lax'` para compatibilidade com Railway
+   - `secure: true` em produção (requer HTTPS)
+   - Trust proxy configurado automaticamente
+
+5. **Build Completo**:
+   ```bash
+   # Reconstruir do zero
+   npm clean-install
+   npm run build
+   npm run start
+   ```
 
 ### Problema: Select de Serviços Fica Carregando
 

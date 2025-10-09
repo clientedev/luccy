@@ -6,6 +6,12 @@ import { ensureDatabaseSetup, diagnoseDatabaseIssues } from "./migrate";
 import { seedCategories } from "./seed-categories";
 
 const app = express();
+
+// Configure for Railway deployment
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
