@@ -15,16 +15,20 @@ declare module "express-session" {
   }
 }
 
-export async function registerRoutes(app: Express): Promise<Server> {
-  // Configure PostgreSQL session store
+export async function registerRoutes(app: Express, existingServer?: Server): Promise<Server> {
+  // Configure PostgreSQL session store with error handling
   const PgSession = connectPgSimple(session);
   
   // Session middleware with PostgreSQL store
+  // Using lazy initialization to not block server startup
   app.use(session({
     store: new PgSession({
       pool: pool,
       tableName: 'session',
-      createTableIfMissing: true
+      createTableIfMissing: true,
+      errorLog: (err) => {
+        console.error('Session store error:', err);
+      }
     }),
     secret: process.env.SESSION_SECRET || (function() {
       if (process.env.NODE_ENV === 'production') {
@@ -743,7 +747,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
+  // Use existing server if provided, otherwise create new one
+  const httpServer = existingServer || createServer(app);
 
   return httpServer;
 }

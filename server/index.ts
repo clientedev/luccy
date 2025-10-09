@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
@@ -12,10 +13,14 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 
-// CRITICAL: Healthcheck must be FIRST, before any middleware or DB operations
-// Railway needs immediate response, not waiting for DB initialization
+// CRITICAL: Healthcheck must be FIRST and ALWAYS respond immediately
+// Railway healthcheck cannot wait for DB, routes, or anything else
 app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok' });
+  res.status(200).json({ 
+    status: 'ok', 
+    timestamp: Date.now(),
+    env: process.env.NODE_ENV 
+  });
 });
 
 app.use(express.json({ limit: '50mb' }));
@@ -51,18 +56,47 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
-  const server = await registerRoutes(app);
+// Error handler
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
 
-  // Database initialization - run in background after server is ready
+  log(`Error: ${err.message || err}`);
+  if (err.stack) {
+    log(err.stack);
+  }
+  
+  res.status(status).json({ message });
+});
+
+(async () => {
+  // Create HTTP server immediately
+  const server = createServer(app);
+
+  // CRITICAL: Start listening IMMEDIATELY before anything else
+  const port = parseInt(process.env.PORT || '5000', 10);
+  
+  await new Promise<void>((resolve) => {
+    server.listen({
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    }, () => {
+      log(`🚀 Server listening on port ${port}`);
+      log(`✅ Healthcheck ready at /health`);
+      resolve();
+    });
+  });
+
+  // NOW the server is listening and healthcheck is responding
+  // Everything below runs in background and won't affect healthcheck
+
+  // Database initialization - completely async
   const initializeDatabase = async () => {
     try {
-      // Em produção (Railway), as migrações já rodaram no build
-      // Então apenas fazemos verificações rápidas
       if (process.env.NODE_ENV === 'production') {
         log('Production mode - skipping database setup (already done in build)');
       } else {
-        // Em desenvolvimento, executar setup completo
         await ensureDatabaseSetup();
         
         try {
@@ -74,7 +108,6 @@ app.use((req, res, next) => {
         await diagnoseDatabaseIssues();
       }
 
-      // Initialize seed data if available
       if (typeof (storage as any).initializeSeedData === 'function') {
         log('Initializing database seed data...');
         await (storage as any).initializeSeedData();
@@ -82,46 +115,37 @@ app.use((req, res, next) => {
       }
     } catch (error) {
       log(`Error during database initialization: ${error}`);
-      // Continue - app should still work
     }
   };
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+  // App initialization - completely async
+  const initializeApp = async () => {
+    try {
+      // Register routes (may depend on database for sessions)
+      await registerRoutes(app, server);
+      log('✅ Routes registered successfully');
 
-    log(`Error: ${err.message || err}`);
-    if (err.stack) {
-      log(err.stack);
+      // Setup Vite or static serving
+      if (app.get("env") === "development") {
+        await setupVite(app, server);
+      } else {
+        serveStatic(app);
+      }
+
+      // Initialize database
+      await initializeDatabase();
+    } catch (error) {
+      log(`❌ Error during app initialization: ${error}`);
+      if (error instanceof Error && error.stack) {
+        log(error.stack);
+      }
+      // Don't crash - server should keep running for healthcheck
     }
-    
-    res.status(status).json({ message });
-  });
+  };
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
-
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-    
-    // Initialize database in background (non-blocking)
-    initializeDatabase().catch(err => {
-      log(`Background database initialization failed: ${err}`);
-    });
+  // Start background initialization - server is already listening
+  initializeApp().catch(err => {
+    log(`Fatal error during initialization: ${err}`);
+    // Don't crash - server must stay up for Railway healthcheck
   });
 })();
