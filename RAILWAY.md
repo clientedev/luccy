@@ -50,6 +50,19 @@ npm run start
 
 ## 🔧 Scripts Disponíveis
 
+### Testar Antes do Deploy
+```bash
+# Testar build de produção localmente
+chmod +x test-production.sh
+./test-production.sh
+
+# Ou manualmente:
+npm run build
+NODE_ENV=production npm run start
+# Em outro terminal:
+curl http://localhost:5000/health
+```
+
 ### Deploy para Railway
 ```bash
 # Build do projeto
