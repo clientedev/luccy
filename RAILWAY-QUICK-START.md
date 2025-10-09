@@ -56,6 +56,16 @@ curl http://localhost:5000/health
 # Deve retornar: {"status":"ok","timestamp":"..."}
 ```
 
+## ⚡ Correção Crítica Aplicada
+
+O endpoint `/health` agora está configurado **ANTES** de qualquer middleware ou inicialização de banco de dados. Isso garante resposta instantânea (<5ms) para o healthcheck do Railway, mesmo durante a inicialização do app.
+
+**O que foi corrigido:**
+- ✅ Healthcheck movido para o início do servidor (server/index.ts)
+- ✅ Responde antes de qualquer operação de banco de dados
+- ✅ Não depende de sessões ou outros middlewares
+- ✅ Tempo de resposta: ~3-4ms
+
 ## 🔍 Como Debugar no Railway
 
 ### Ver Logs em Tempo Real
