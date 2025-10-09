@@ -9,9 +9,11 @@ Luccy Studio is a beauty salon website built with React, TypeScript, and Express
 - **Error Handling**: Enhanced queryClient with better error logging and retry logic for Railway deployment.
 - **Railway Configuration**: Fixed error 502 with proper healthcheck endpoint, proxy trust, and session configuration.
 - **Query Client**: Added retry logic (1 retry) for transient errors in production.
-- **Healthcheck Endpoint**: Added `/health` endpoint for Railway healthcheck monitoring.
+- **Healthcheck Endpoint**: Added `/health` endpoint at server start (responds in <5ms) for Railway healthcheck monitoring.
+- **Healthcheck Fix**: Moved healthcheck to server/index.ts BEFORE database initialization to ensure instant response.
 - **Session Configuration**: Changed `sameSite` to 'lax' for better Railway compatibility.
 - **Documentation**: Created RAILWAY.md and RAILWAY-QUICK-START.md with complete deployment guides.
+- **Test Scripts**: Added test-healthcheck.sh and test-production.sh for local validation.
 
 # User Preferences
 
