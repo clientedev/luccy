@@ -16,25 +16,7 @@ declare module "express-session" {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Healthcheck endpoint (must be before session middleware)
-  app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
-  });
-
-  app.get('/', (req, res, next) => {
-    // If it's a healthcheck or API route, skip to next handler
-    if (req.path === '/health' || req.path.startsWith('/api')) {
-      return next();
-    }
-    next();
-  });
-
-  // Trust proxy for Railway deployment
-  if (process.env.NODE_ENV === 'production') {
-    app.set('trust proxy', 1);
-  }
-  
-  // Configure PostgreSQL session store with error handling
+  // Configure PostgreSQL session store
   const PgSession = connectPgSimple(session);
   
   // Session middleware with PostgreSQL store

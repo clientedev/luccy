@@ -12,6 +12,12 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 
+// CRITICAL: Healthcheck must be FIRST, before any middleware or DB operations
+// Railway needs immediate response, not waiting for DB initialization
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
