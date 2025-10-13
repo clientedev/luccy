@@ -13,9 +13,34 @@ function getPool(): Pool {
         "DATABASE_URL must be set. Did you forget to provision a database?",
       );
     }
-    _pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    
+    // Configure pool for Railway's PostgreSQL limits (typically 4-5 connections for free tier)
+    _pool = new Pool({ 
+      connectionString: process.env.DATABASE_URL,
+      max: 3, // Keep below Railway's connection limit to avoid exhaustion
+      connectionTimeoutMillis: 5000, // Fail fast if can't connect in 5s
+      idleTimeoutMillis: 10000, // Close idle connections after 10s
+      allowExitOnIdle: false, // Keep pool alive
+      keepAlive: true, // TCP keepalive to prevent connection drops
+      keepAliveInitialDelayMillis: 10000,
+    });
+
+    // Handle pool errors gracefully
+    _pool.on('error', (err) => {
+      console.error('Unexpected database pool error:', err);
+    });
   }
   return _pool;
+}
+
+// Graceful shutdown handler
+export async function closePool() {
+  if (_pool) {
+    await _pool.end();
+    _pool = null;
+    _db = null;
+    console.log('Database pool closed');
+  }
 }
 
 function getDb() {

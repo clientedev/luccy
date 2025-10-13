@@ -5,6 +5,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
 import { ensureDatabaseSetup, diagnoseDatabaseIssues } from "./migrate";
 import { seedCategories } from "./seed-categories";
+import { closePool } from "./db";
 
 const app = express();
 
@@ -90,20 +91,15 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   // Database initialization - completely async, never fails startup
   const initializeDatabase = async () => {
     try {
-      // Always run migrations in production (Railway doesn't run them in build anymore)
-      await ensureDatabaseSetup();
-      
-      try {
-        await seedCategories();
-      } catch (error) {
-        log(`Warning: Could not seed categories: ${error}`);
-      }
-      
-      // Only diagnose in development
+      // PRODUCTION: Migrations already ran during build (railway-migrate.ts)
+      // DEVELOPMENT: Run migrations on startup for local development
       if (process.env.NODE_ENV !== 'production') {
+        await ensureDatabaseSetup();
+        await seedCategories();
         await diagnoseDatabaseIssues();
       }
 
+      // Initialize seed data in all environments
       if (typeof (storage as any).initializeSeedData === 'function') {
         log('Initializing database seed data...');
         await (storage as any).initializeSeedData();
@@ -143,4 +139,31 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   initializeApp().catch(err => {
     log(`Fatal error during initialization: ${err}`);
   });
+
+  // Graceful shutdown handlers
+  const gracefulShutdown = async (signal: string) => {
+    log(`\n${signal} received. Starting graceful shutdown...`);
+    
+    try {
+      // Close server to stop accepting new connections
+      await new Promise<void>((resolve) => {
+        server.close(() => {
+          log('HTTP server closed');
+          resolve();
+        });
+      });
+
+      // Close database pool
+      await closePool();
+      
+      log('Graceful shutdown completed');
+      process.exit(0);
+    } catch (error) {
+      log(`Error during shutdown: ${error}`);
+      process.exit(1);
+    }
+  };
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 })();

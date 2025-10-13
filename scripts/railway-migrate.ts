@@ -51,9 +51,11 @@ async function runMigration() {
     if (error.stdout) console.log('stdout:', error.stdout);
     if (error.stderr) console.log('stderr:', error.stderr);
     
-    // Não falhar o deploy por causa de migrations - deixar o servidor tentar
-    console.log('\n⚠ Continuando mesmo com erro na migração...');
-    process.exit(0);
+    // FAIL FAST: Stop deployment if migrations fail
+    // This prevents deploying with outdated/broken database schema
+    console.log('\n❌ Deploy abortado devido a erro na migração.');
+    console.log('💡 Corrija os erros de migração antes de fazer deploy novamente.');
+    process.exit(1); // Exit with error code to block Railway deployment
   }
 }
 
