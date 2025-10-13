@@ -70,23 +70,29 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 (async () => {
-  // Create HTTP server immediately
-  const server = createServer(app);
+  try {
+    // Create HTTP server immediately
+    const server = createServer(app);
 
-  // CRITICAL: Start listening IMMEDIATELY before anything else
-  const port = parseInt(process.env.PORT || '5000', 10);
-  
-  await new Promise<void>((resolve) => {
-    server.listen({
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    }, () => {
-      log(`🚀 Server listening on port ${port}`);
-      log(`✅ Healthcheck ready at /health`);
-      resolve();
+    // CRITICAL: Start listening IMMEDIATELY before anything else
+    const port = parseInt(process.env.PORT || '5000', 10);
+    
+    log(`Starting server on port ${port}...`);
+    log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    log(`DATABASE_URL configured: ${!!process.env.DATABASE_URL}`);
+    
+    await new Promise<void>((resolve, reject) => {
+      server.on('error', (err) => {
+        log(`Server error: ${err.message}`);
+        reject(err);
+      });
+      
+      server.listen(port, "0.0.0.0", () => {
+        log(`🚀 Server listening on port ${port}`);
+        log(`✅ Healthcheck ready at /health`);
+        resolve();
+      });
     });
-  });
 
   // Database initialization - completely async, never fails startup
   const initializeDatabase = async () => {

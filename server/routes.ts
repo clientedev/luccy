@@ -27,7 +27,8 @@ export async function registerRoutes(app: Express, existingServer?: Server): Pro
       tableName: 'session',
       createTableIfMissing: true,
       errorLog: (err) => {
-        console.error('Session store error:', err);
+        // Log errors but don't crash - session store failures shouldn't stop the server
+        console.error('Session store error (non-fatal):', err.message || err);
       }
     }),
     secret: process.env.SESSION_SECRET || (function() {
