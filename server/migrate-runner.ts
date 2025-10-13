@@ -5,6 +5,7 @@
 
 import { ensureDatabaseSetup } from './migrate';
 import { seedCategories } from './seed-categories';
+import { storage } from './storage';
 
 async function run() {
   try {
@@ -16,12 +17,19 @@ async function run() {
     // 2. Seed de categorias
     await seedCategories();
     
+    // 3. Inicializar dados seed (serviços, horários, galeria)
+    if (typeof (storage as any).initializeSeedData === 'function') {
+      console.log('\n🌱 Inicializando dados seed...');
+      await (storage as any).initializeSeedData();
+      console.log('✅ Dados seed inicializados!');
+    }
+    
     console.log('\n✅ Configuração concluída!');
     process.exit(0);
   } catch (error) {
     console.error('❌ Erro:', error);
-    // Não falhar - deixar o servidor tentar mesmo com erro
-    process.exit(0);
+    // FAIL FAST: Block deployment if database setup fails
+    process.exit(1);
   }
 }
 

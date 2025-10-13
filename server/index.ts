@@ -92,18 +92,20 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   const initializeDatabase = async () => {
     try {
       // PRODUCTION: Migrations already ran during build (railway-migrate.ts)
-      // DEVELOPMENT: Run migrations on startup for local development
+      // Skip all database initialization in production to ensure instant healthcheck response
       if (process.env.NODE_ENV !== 'production') {
         await ensureDatabaseSetup();
         await seedCategories();
         await diagnoseDatabaseIssues();
-      }
-
-      // Initialize seed data in all environments
-      if (typeof (storage as any).initializeSeedData === 'function') {
-        log('Initializing database seed data...');
-        await (storage as any).initializeSeedData();
-        log('Database seed data initialized successfully');
+        
+        // Initialize seed data only in development
+        if (typeof (storage as any).initializeSeedData === 'function') {
+          log('Initializing database seed data...');
+          await (storage as any).initializeSeedData();
+          log('Database seed data initialized successfully');
+        }
+      } else {
+        log('⚡ Production mode: Skipping database initialization (already done during build)');
       }
     } catch (error) {
       log(`Error during database initialization: ${error}`);
