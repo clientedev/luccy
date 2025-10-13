@@ -30,8 +30,13 @@ PORT=5000
 No Railway, configure o Build Command como:
 
 ```bash
-npm install && npm run build
+npm install && tsx scripts/railway-migrate.ts && npm run build
 ```
+
+⚠️ **IMPORTANTE**: O script `railway-migrate.ts` deve rodar DURANTE O BUILD, não no runtime. Isso garante que:
+- Migrations rodam antes do servidor iniciar
+- Deploy falha se houver erro nas migrations
+- Servidor inicia instantaneamente em produção
 
 ### 3. Start Command
 

@@ -4,6 +4,15 @@ Luccy Studio is a beauty salon website built with React, TypeScript, and Express
 
 # Recent Changes
 
+## October 13, 2025
+- **Railway Deployment Fix**: Resolved critical production issues (502 errors, health check failures, performance problems)
+  - **Connection Pool Optimization**: Configured PostgreSQL pool with max 3 connections, 5s connection timeout, 10s idle timeout, and TCP keepalive for Railway's connection limits
+  - **Migration Strategy**: Moved database migrations to build-time only (not runtime) in production to prevent startup delays and connection exhaustion
+  - **Fail-Fast Migrations**: Updated railway-migrate.ts to exit with error code 1 on failure, preventing deployment with broken schema
+  - **Graceful Shutdown**: Added SIGTERM/SIGINT handlers to properly close HTTP server and database pool on redeploy
+  - **Production Optimization**: Skip ensureDatabaseSetup, seedCategories, and diagnoseDatabaseIssues in production runtime
+  - **Documentation**: Created RAILWAY_FIX_502_ERRORS.md with complete analysis and solutions
+
 ## October 09, 2025
 - **Scroll to Top**: Implemented automatic scroll to top when navigating between pages using ScrollToTop component.
 - **Error Handling**: Enhanced queryClient with better error logging and retry logic for Railway deployment.
