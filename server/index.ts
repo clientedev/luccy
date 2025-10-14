@@ -143,35 +143,39 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     }
   };
 
-  // Start background initialization
-  initializeApp().catch(err => {
-    log(`Fatal error during initialization: ${err}`);
-  });
+    // Start background initialization
+    initializeApp().catch(err => {
+      log(`Fatal error during initialization: ${err}`);
+    });
 
-  // Graceful shutdown handlers
-  const gracefulShutdown = async (signal: string) => {
-    log(`\n${signal} received. Starting graceful shutdown...`);
-    
-    try {
-      // Close server to stop accepting new connections
-      await new Promise<void>((resolve) => {
-        server.close(() => {
-          log('HTTP server closed');
-          resolve();
-        });
-      });
-
-      // Close database pool
-      await closePool();
+    // Graceful shutdown handlers
+    const gracefulShutdown = async (signal: string) => {
+      log(`\n${signal} received. Starting graceful shutdown...`);
       
-      log('Graceful shutdown completed');
-      process.exit(0);
-    } catch (error) {
-      log(`Error during shutdown: ${error}`);
-      process.exit(1);
-    }
-  };
+      try {
+        // Close server to stop accepting new connections
+        await new Promise<void>((resolve) => {
+          server.close(() => {
+            log('HTTP server closed');
+            resolve();
+          });
+        });
 
-  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+        // Close database pool
+        await closePool();
+        
+        log('Graceful shutdown completed');
+        process.exit(0);
+      } catch (error) {
+        log(`Error during shutdown: ${error}`);
+        process.exit(1);
+      }
+    };
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  } catch (error) {
+    log(`❌ Fatal startup error: ${error}`);
+    process.exit(1);
+  }
 })();
