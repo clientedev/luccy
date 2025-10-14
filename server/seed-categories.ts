@@ -48,8 +48,9 @@ export async function seedCategories() {
   }
 }
 
-// Permite executar o script diretamente
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Permite executar o script diretamente (apenas em desenvolvimento)
+// Não incluir no bundle de produção
+if (process.env.NODE_ENV !== 'production' && import.meta.url === `file://${process.argv[1]}`) {
   seedCategories()
     .then(() => process.exit(0))
     .catch((error) => {
