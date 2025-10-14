@@ -14,15 +14,15 @@ export default function About() {
             <h1 className="text-4xl font-serif font-bold text-foreground mb-6">Sobre o Luccy Studio</h1>
             <div className="space-y-6 text-muted-foreground">
               <p className="text-lg leading-relaxed" data-testid="about-paragraph-1">
-                O Luccy Studio nasceu para transformar a autoestima de cada cliente. Embora o salão seja recente, nossa experiência em moda e beleza já soma mais de 20 anos.
+                O Luccy Studio nasceu para transformar a autoestima de cada cliente. Trazemos expertise consolidada em moda e beleza para oferecer serviços de excelência.
               </p>
               <p className="text-lg leading-relaxed" data-testid="about-paragraph-2">
                 Aqui unimos cuidados especializados em cabelo, unhas, cílios e maquiagem com um espaço acolhedor e sofisticado.
               </p>
               <div className="grid grid-cols-2 gap-6 py-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-2" data-testid="stat-experience">20+</div>
-                  <div className="text-sm text-muted-foreground">Anos de Experiência</div>
+                  <div className="text-3xl font-bold text-primary mb-2" data-testid="stat-experience">Premium</div>
+                  <div className="text-sm text-muted-foreground">Técnicas Exclusivas</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary mb-2" data-testid="stat-clients">500+</div>

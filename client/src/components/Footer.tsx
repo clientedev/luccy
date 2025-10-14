@@ -47,7 +47,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-background/80 text-sm">
-              Transformando autoestima com mais de 20 anos de experiência em beleza.
+              Transformando autoestima com excelência e dedicação em beleza.
             </p>
           </div>
 

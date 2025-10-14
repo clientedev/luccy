@@ -160,7 +160,7 @@ export default function Home() {
             
             {/* Subtítulo */}
             <p className="font-sans-modern text-lg sm:text-xl lg:text-2xl mb-12 text-black md:text-gold-bright/90 max-w-2xl mx-auto leading-relaxed" style={{ textShadow: '0 1px 8px rgba(212, 175, 55, 0.5), 0 0 15px rgba(212, 175, 55, 0.3)' }}>
-              Mais de 20 anos de excelência em técnicas exclusivas de beleza. 
+              Excelência em técnicas exclusivas de beleza. 
               Um refúgio de sofisticação onde sua essência encontra a perfeição.
             </p>
             
@@ -183,8 +183,8 @@ export default function Home() {
           {/* Estatísticas de Confiança */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto mb-16">
             <div className="text-center">
-              <div className="text-5xl font-serif-luxury font-bold text-gold-bright mb-3">20+</div>
-              <div className="font-sans-modern text-gold/80 text-base uppercase tracking-wide">Anos de Experiência</div>
+              <div className="text-5xl font-serif-luxury font-bold text-gold-bright mb-3">Premium</div>
+              <div className="font-sans-modern text-gold/80 text-base uppercase tracking-wide">Técnicas Exclusivas</div>
             </div>
             
             <div className="text-center">
@@ -193,8 +193,8 @@ export default function Home() {
             </div>
             
             <div className="text-center">
-              <div className="text-5xl font-serif-luxury font-bold text-gold-bright mb-3">Premium</div>
-              <div className="font-sans-modern text-gold/80 text-base uppercase tracking-wide">Produtos Exclusivos</div>
+              <div className="text-5xl font-serif-luxury font-bold text-gold-bright mb-3">5★</div>
+              <div className="font-sans-modern text-gold/80 text-base uppercase tracking-wide">Avaliação Média</div>
             </div>
           </div>
 
