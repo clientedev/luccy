@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { Pool, PoolClient } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "../shared/schema";
 
@@ -14,20 +14,29 @@ function getPool(): Pool {
       );
     }
     
-    // Configure pool for Railway's PostgreSQL limits (typically 4-5 connections for free tier)
+    // Configure pool for Railway's PostgreSQL with generous timeouts
+    // Railway has cold starts and limited free-tier connections (typically 4-5)
     _pool = new Pool({ 
       connectionString: process.env.DATABASE_URL,
       max: 3, // Keep below Railway's connection limit to avoid exhaustion
-      connectionTimeoutMillis: 5000, // Fail fast if can't connect in 5s
-      idleTimeoutMillis: 10000, // Close idle connections after 10s
+      min: 0, // Allow pool to shrink to 0 when idle
+      connectionTimeoutMillis: 30000, // 30 seconds to connect (Railway cold starts)
+      idleTimeoutMillis: 30000, // Close idle connections after 30s
       allowExitOnIdle: false, // Keep pool alive
       keepAlive: true, // TCP keepalive to prevent connection drops
       keepAliveInitialDelayMillis: 10000,
+      statement_timeout: 30000, // Statement timeout of 30s
+      query_timeout: 30000, // Query timeout of 30s
     });
 
-    // Handle pool errors gracefully
+    // Handle pool errors gracefully - never crash the server
     _pool.on('error', (err) => {
-      console.error('Unexpected database pool error:', err);
+      console.error('Database pool error (non-fatal):', err.message || err);
+    });
+
+    // Connection acquired
+    _pool.on('connect', () => {
+      console.log('Database connection established');
     });
   }
   return _pool;

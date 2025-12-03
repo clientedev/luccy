@@ -301,6 +301,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteService(id: string): Promise<boolean> {
+    // First, delete all related appointments to avoid foreign key constraint errors
+    await db.delete(appointments).where(eq(appointments.serviceId, id));
+    // Then, delete all related service hours
+    await db.delete(serviceHours).where(eq(serviceHours.serviceId, id));
+    // Now delete the service
     const result = await db.delete(services).where(eq(services.id, id));
     return (result.rowCount ?? 0) > 0;
   }

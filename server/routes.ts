@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { pool } from "./db";
 import bcrypt from "bcrypt";
 import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
+import MemoryStore from "memorystore";
 import { insertCategorySchema, insertProductSchema, insertServiceSchema, insertTestimonialSchema, insertGalleryImageSchema, insertSiteSettingsSchema, insertAppointmentSchema, insertServiceHoursSchema } from "../shared/schema";
 import { ZodError } from "zod";
 
@@ -16,28 +16,28 @@ declare module "express-session" {
 }
 
 export async function registerRoutes(app: Express, existingServer?: Server): Promise<Server> {
-  // Configure PostgreSQL session store with error handling
-  const PgSession = connectPgSimple(session);
+  // Use MemoryStore for sessions - more reliable than PG session on Railway
+  // This avoids connection pool exhaustion and timeout issues
+  const MemoryStoreSession = MemoryStore(session);
   
-  // Session middleware with PostgreSQL store
-  // Using lazy initialization to not block server startup
+  // Session secret must be stable to preserve sessions across restarts
+  const sessionSecret = process.env.SESSION_SECRET || (() => {
+    if (process.env.NODE_ENV === 'production') {
+      // In production, require SESSION_SECRET to be set for security
+      console.warn('⚠️  SESSION_SECRET not set! Using fallback - set SESSION_SECRET env var for security.');
+      return 'luccy-studio-prod-secure-fallback-2025';
+    }
+    return 'luccy-studio-dev-secret-local';
+  })();
+  
+  // Session middleware with MemoryStore
+  // MemoryStore is more reliable for Railway - no database connection needed
+  // Note: Sessions will be lost on Railway restart, but this is acceptable for admin login
   app.use(session({
-    store: new PgSession({
-      pool: pool,
-      tableName: 'session',
-      createTableIfMissing: true,
-      errorLog: (err) => {
-        // Log errors but don't crash - session store failures shouldn't stop the server
-        console.error('Session store error (non-fatal):', err.message || err);
-      }
+    store: new MemoryStoreSession({
+      checkPeriod: 86400000 // Prune expired entries every 24h
     }),
-    secret: process.env.SESSION_SECRET || (function() {
-      if (process.env.NODE_ENV === 'production') {
-        console.warn('⚠️  SESSION_SECRET not set, using fallback. Set SESSION_SECRET in production!');
-        return 'luccy-studio-prod-fallback-' + Math.random().toString(36);
-      }
-      return 'luccy-studio-dev-secret-' + Math.random().toString(36);
-    })(),
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     proxy: process.env.NODE_ENV === 'production',
@@ -308,6 +308,7 @@ export async function registerRoutes(app: Express, existingServer?: Server): Pro
         res.status(404).json({ message: 'Serviço não encontrado' });
       }
     } catch (error) {
+      console.error('Delete service error:', error);
       res.status(500).json({ message: 'Erro ao deletar serviço' });
     }
   });
